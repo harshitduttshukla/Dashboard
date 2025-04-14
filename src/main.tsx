@@ -6,14 +6,21 @@ import Customcommands from './Services/Customcommands.tsx'
 import Customcommands1 from './Services/Customcommands1.tsx'
 import ActuationFetcher from './Services/ActuationFetcher .tsx'
 import CommandFetcher from './Services/CommandFetcher .tsx'
+import ModelListPage from './Services/ModelListPage.tsx'
+import BikeMakeList from './Services/BikeMakeList.tsx'
+import OdometerDetails from './Services/OdometerDetails.tsx'
+
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     {/* <App />
      */}
      {/* <Customcommands/> */}
-     {/* <Customcommands1/> */}
+     {/* <Customcommands
      {/* <ActuationFetcher/> */}
-     <CommandFetcher/>
+     {/* <CommandFetcher/> */}
+     {/* <ModelListPage/> */}
+     {/* <BikeMakeList/> */}
+     <OdometerDetails/>
   </StrictMode>,
 )
