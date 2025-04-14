@@ -31,6 +31,79 @@ function Sidebar() {
         >
           Service for Scan Car
         </NavLink>
+        <NavLink
+          to="/Customcommands1"
+          className={({ isActive }) =>
+            `block px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200 ${
+              isActive
+                ? 'bg-blue-500 text-white shadow'
+                : 'text-gray-700 hover:bg-blue-100'
+            }`
+          }
+        >
+          Custom commands
+        </NavLink>
+        <NavLink
+          to="/ActuationFetcher"
+          className={({ isActive }) =>
+            `block px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200 ${
+              isActive
+                ? 'bg-blue-500 text-white shadow'
+                : 'text-gray-700 hover:bg-blue-100'
+            }`
+          }
+        >
+          ActuationFetcher
+        </NavLink>
+        <NavLink
+          to="/CommandFetcher"
+          className={({ isActive }) =>
+            `block px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200 ${
+              isActive
+                ? 'bg-blue-500 text-white shadow'
+                : 'text-gray-700 hover:bg-blue-100'
+            }`
+          }
+        >
+          CommandFetcher
+        </NavLink>
+        <NavLink
+          to="/ModelListPage"
+          className={({ isActive }) =>
+            `block px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200 ${
+              isActive
+                ? 'bg-blue-500 text-white shadow'
+                : 'text-gray-700 hover:bg-blue-100'
+            }`
+          }
+        >
+          Model List Page
+        </NavLink>
+        <NavLink
+          to="/BikeMakeList"
+          className={({ isActive }) =>
+            `block px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200 ${
+              isActive
+                ? 'bg-blue-500 text-white shadow'
+                : 'text-gray-700 hover:bg-blue-100'
+            }`
+          }
+        >
+          Bike Make List
+        </NavLink>
+        <NavLink
+          to="/OdometerDetails"
+          className={({ isActive }) =>
+            `block px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200 ${
+              isActive
+                ? 'bg-blue-500 text-white shadow'
+                : 'text-gray-700 hover:bg-blue-100'
+            }`
+          }
+        >
+          Odometer Details
+        </NavLink>
+
       </div>
     </div>
   );
