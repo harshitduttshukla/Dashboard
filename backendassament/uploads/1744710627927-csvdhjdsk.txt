@@ -1,4 +1,0 @@
-name,email,password
-Alice Johnson,alice@example.com,alice123
-Bob Smith,bob@example.com,bob456
-Charlie Brown,charlie@example.com,charlie789

@@ -8,6 +8,7 @@ import CommandFetcher from './Services/CommandFetcher .tsx'
 import ModelListPage from './Services/ModelListPage.tsx'
 import BikeMakeList from './Services/BikeMakeList.tsx'
 import OdometerDetails from './Services/OdometerDetails.tsx'
+import FileUploader from './Services/Updatecommand.tsx'
 
 
 
@@ -27,6 +28,7 @@ function App() {
       <Route path="ModelListPage" element={<ModelListPage/>}/>
       <Route path="BikeMakeList" element={<BikeMakeList/>}/>
       <Route path="OdometerDetails" element={<OdometerDetails/>}/>
+      <Route path="Updatecommand" element={<FileUploader/>}/>
     </Route>
     </Routes>
     </BrowserRouter>
