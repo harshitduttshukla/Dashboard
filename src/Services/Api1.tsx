@@ -1,4 +1,11 @@
 import React, { useState } from 'react';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+console.log("BASE_URL =", BASE_URL);
+
+
+// const url = `${BASE_URL}api/fetch_coverage?make=${encodeURIComponent(make)}`;
+
 
 type CoverageItem = {
   function_name: string;
@@ -9,30 +16,33 @@ const Api1: React.FC = () => {
   const [make, setMake] = useState('');
   const [data, setData] = useState<CoverageItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const handleSearch = () => {
     if (!make.trim()) {
-      setError("Please enter a car make.");
+      setError('Please enter a car make.');
       return;
     }
 
     setLoading(true);
-    setError("");
-    const encodedUrl = encodeURIComponent(
-      `http://13.202.193.4:3000/api/fetch_coverage?make=${make}`
-    );
+    setError('');
 
-    fetch(`https://api.allorigins.win/get?url=${encodedUrl}`)
-      .then((res) => res.json())
+    const url = `${BASE_URL}api/fetch_coverage?make=${encodeURIComponent(make)}`;
+
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then((result) => {
-        const parsed = JSON.parse(result.contents);
-        setData(parsed.data);
+        setData(result.data || []);
         setLoading(false);
       })
       .catch((err) => {
         console.error(err);
-        setError("Failed to fetch data.");
+        setError('Failed to fetch data.');
         setLoading(false);
       });
   };
