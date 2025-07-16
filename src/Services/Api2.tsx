@@ -5,15 +5,16 @@ type CommandItem = {
   module: string;
 };
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/';
+
 const Api2: React.FC = () => {
-  const [make, setMake] = useState('');  // done
-  const [modules, setModules] = useState<string[]>(['Engine']);   // for select thrree option 
+  const [make, setMake] = useState('');
+  const [modules, setModules] = useState<string[]>(['Engine']);
   const [functionType, setFunctionType] = useState('scan');
   const [fullScan, setFullScan] = useState(true);
-  const [commandData, setCommandData] = useState<CommandItem[]>([]);  //done
-  const [loading, setLoading] = useState(false);  //done
-
-  const [error, setError] = useState(''); //done
+  const [commandData, setCommandData] = useState<CommandItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleScan = () => {
     if (!make.trim()) {
@@ -25,15 +26,19 @@ const Api2: React.FC = () => {
     setError('');
 
     const moduleStr = encodeURIComponent(JSON.stringify(modules));
-    const encodedUrl = encodeURIComponent(
-      `http://13.202.193.4:3000/api/fetch_command1?make=${make}&module=${moduleStr}&function_type=${functionType}&full_scan=${fullScan}`
-    );
+    const url = `${BASE_URL}api/fetch_command1?make=${encodeURIComponent(make)}&module=${moduleStr}&function_type=${functionType}&full_scan=${fullScan}`;
 
-    fetch(`https://api.allorigins.win/get?url=${encodedUrl}`)
-      .then((res) => res.json())
+    console.log('Request URL:', url);
+
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then((result) => {
-        const parsed = JSON.parse(result.contents);
-        setCommandData(parsed.data);
+        setCommandData(result.data || []);
         setLoading(false);
       })
       .catch((err) => {

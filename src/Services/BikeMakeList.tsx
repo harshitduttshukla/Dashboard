@@ -1,36 +1,33 @@
 import React, { useEffect, useState } from "react";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/";
+
 const BikeMakeList: React.FC = () => {
   const [bikeMakes, setBikeMakes] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [segment, setSegment] = useState<string>("bike"); // State for the segment input
+  const [segment, setSegment] = useState<string>("bike");
 
   const fetchBikeMakes = async () => {
     setLoading(true);
     setError("");
 
     try {
-      const originalUrl = `http://13.202.193.4:3000/api/fetch_make_list?segement=${segment}`;
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(originalUrl)}`;
+      const url = `${BASE_URL}api/fetch_make_list?segement=${encodeURIComponent(segment)}`;
 
-      const response = await fetch(proxyUrl);
-      const result = await response.json();
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-      if (result.contents) {
-        const json = JSON.parse(result.contents);
+      const json = await response.json();
 
-        if (json.data && Array.isArray(json.data)) {
-          // Updated to access the 'name' field
-          const makes = json.data.map((item: { name: string }) => item.name);
-          setBikeMakes(makes);
-        } else {
-          setBikeMakes([]);
-          setError("No bike makes found.");
-        }
+      if (json.data && Array.isArray(json.data)) {
+        const makes = json.data.map((item: { name: string }) => item.name);
+        setBikeMakes(makes);
       } else {
         setBikeMakes([]);
-        setError("Invalid response from proxy.");
+        setError("No bike makes found.");
       }
     } catch (err) {
       console.error("Error fetching bike makes:", err);
@@ -41,18 +38,16 @@ const BikeMakeList: React.FC = () => {
     }
   };
 
-  // Function to handle segment input change
   const handleSegmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSegment(e.target.value);
   };
 
-  // Fetch bike makes when component mounts or segment changes
   useEffect(() => {
     fetchBikeMakes();
   }, [segment]);
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div className="max-w-3xl mx-auto p-6 bg-white rounded shadow">
       <h1 className="text-2xl font-bold text-center text-green-700 mb-4">
         Bike Make List
       </h1>

@@ -1,7 +1,12 @@
+
+
+
 import React, { useEffect, useState } from "react";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/";
+
 const ModelListPage: React.FC = () => {
-  const [makeList, setMakeList] = useState<string[]>([
+  const [makeList] = useState<string[]>([
     "Hyundai",
     "Maruti",
     "Mahindra",
@@ -14,35 +19,31 @@ const ModelListPage: React.FC = () => {
   const [error, setError] = useState<string>("");
 
   const fetchModels = async () => {
+    if (!selectedMake) return;
+
     setLoading(true);
     setError("");
+    setModelList([]);
 
     try {
       const trimmedMake = selectedMake.trim();
-      const originalUrl = `http://13.202.193.4:3000/api/fetch_model_list?make=${trimmedMake}`;
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(originalUrl)}`;
+      const url = `${API_BASE_URL}api/fetch_model_list?make=${encodeURIComponent(trimmedMake)}`;
+      console.log("Fetching models from:", url);
 
-      const response = await fetch(proxyUrl);
-      const result = await response.json();
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-      if (result.contents) {
-        const json = JSON.parse(result.contents);
+      const json = await response.json();
+      console.log("API Response:", json);
 
-        if (json.data && Array.isArray(json.data)) {
-          // Extract model names from the `data` array
-          const names = json.data.map((item: { name: string }) => item.name);
-          setModelList(names);
-        } else {
-          setModelList([]);
-          setError("No models found for selected make.");
-        }
+      if (Array.isArray(json.data) && json.data.length > 0) {
+        const names = json.data.map((item: { name: string }) => item.name);
+        setModelList(names);
       } else {
-        setModelList([]);
-        setError("Invalid response from proxy.");
+        setError("No models found for the selected make.");
       }
     } catch (err) {
-      console.error("Error fetching model list:", err);
-      setModelList([]);
+      console.error("Fetch error:", err);
       setError("Failed to fetch model list. Please try again later.");
     } finally {
       setLoading(false);
@@ -66,12 +67,19 @@ const ModelListPage: React.FC = () => {
           onChange={(e) => setSelectedMake(e.target.value)}
           className="border px-4 py-2 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          {makeList.map((make, idx) => (
-            <option key={idx} value={make}>
+          {makeList.map((make) => (
+            <option key={make} value={make}>
               {make}
             </option>
           ))}
         </select>
+
+        <button
+          onClick={fetchModels}
+          className="ml-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+        >
+          Refresh
+        </button>
       </div>
 
       {loading && <p className="text-blue-500 text-center">Loading models...</p>}
@@ -83,11 +91,15 @@ const ModelListPage: React.FC = () => {
             Models for {selectedMake}:
           </h2>
           <ul className="list-disc list-inside text-gray-700 space-y-1">
-            {modelList.map((model, idx) => (
-              <li key={idx}>{model}</li>
+            {modelList.map((model) => (
+              <li key={model}>{model}</li>
             ))}
           </ul>
         </div>
+      )}
+
+      {!loading && !error && modelList.length === 0 && (
+        <p className="text-center text-gray-500">No models available for the selected make.</p>
       )}
     </div>
   );

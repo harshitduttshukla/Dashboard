@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-console.log("BASE_URL =", BASE_URL);
-
-
-// const url = `${BASE_URL}api/fetch_coverage?make=${encodeURIComponent(make)}`;
 
 
 type CoverageItem = {
   function_name: string;
   function_type: string;
 };
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/';
+console.log("BASE_URL =", BASE_URL);
 
 const Api1: React.FC = () => {
   const [make, setMake] = useState('');
