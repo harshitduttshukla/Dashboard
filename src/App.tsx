@@ -9,6 +9,7 @@ import ActuationFetcher from './Services/ActuationFetcher .tsx'
 import CommandFetcher from './Services/CommandFetcher .tsx'
 import OdometerDetails from './Services/OdometerDetails.tsx'
 import FileUploader from './Services/Updatecommand.tsx'
+import UsersTable from "./Services/UsersTable.tsx";
 
 
 
@@ -22,6 +23,7 @@ function App() {
       <Route path="api1" element={<Api1/>}/>
       <Route path="api2" element={<Api2/>}/>
       <Route path="BikeMakeList" element={<BikeMakeList/>}/>
+      <Route path="UsersTable" element={<UsersTable/>}/>
       <Route path="CommandFetcher" element={<CommandFetcher/>}/>
       <Route path="Customcommands1" element={<Customcommands1/>}/>
       <Route path="ActuationFetcher" element={<ActuationFetcher/>}/>

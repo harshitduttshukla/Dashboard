@@ -7,6 +7,18 @@ function Sidebar() {
 
       <div className="space-y-4">
         <NavLink
+          to="/UsersTable"
+          className={({ isActive }) =>
+            `block px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200 ${
+              isActive
+                ? 'bg-blue-500 text-white shadow'
+                : 'text-gray-700 hover:bg-blue-100'
+            }`
+          }
+        >
+          UsersTable
+        </NavLink>
+        <NavLink
           to="/Api1"
           className={({ isActive }) =>
             `block px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200 ${
