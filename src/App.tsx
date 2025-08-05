@@ -10,6 +10,7 @@ import CommandFetcher from './Services/CommandFetcher .tsx'
 import OdometerDetails from './Services/OdometerDetails.tsx'
 import FileUploader from './Services/Updatecommand.tsx'
 import UsersTable from "./Services/UsersTable.tsx";
+import ObdScanReport from "./Services/Scandetail.tsx";
 
 
 
@@ -22,6 +23,7 @@ function App() {
       {/* <Route path="/" element={<Sidebar/>}/> */}
       <Route path="api1" element={<Api1/>}/>
       <Route path="api2" element={<Api2/>}/>
+      <Route path="ObdScanReport" element={<ObdScanReport/>}/>
       <Route path="BikeMakeList" element={<BikeMakeList/>}/>
       <Route path="UsersTable" element={<UsersTable/>}/>
       <Route path="CommandFetcher" element={<CommandFetcher/>}/>

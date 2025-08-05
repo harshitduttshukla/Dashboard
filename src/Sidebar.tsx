@@ -44,6 +44,18 @@ function Sidebar() {
           Service for Scan Car
         </NavLink>
         <NavLink
+          to="/ObdScanReport"
+          className={({ isActive }) =>
+            `block px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200 ${
+              isActive
+                ? 'bg-blue-500 text-white shadow'
+                : 'text-gray-700 hover:bg-blue-100'
+            }`
+          }
+        >
+         ObdScanReport
+        </NavLink>
+        <NavLink
           to="/Customcommands1"
           className={({ isActive }) =>
             `block px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200 ${
