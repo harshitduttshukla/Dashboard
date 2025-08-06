@@ -11,6 +11,44 @@ import OdometerDetails from './Services/OdometerDetails.tsx'
 import FileUploader from './Services/Updatecommand.tsx'
 import UsersTable from "./Services/UsersTable.tsx";
 import ObdScanReport from "./Services/Scandetail.tsx";
+import ScanDetailPage from "./Compontens/ScanDetailPage.tsx"; //
+
+
+
+
+// function App() {
+//   return (
+//     <BrowserRouter>
+//     <Routes>
+//     <Route path="/" element={<Layout/>}>
+//       {/* <Route path="/" element={<Sidebar/>}/> */}
+//       <Route path="api1" element={<Api1/>}/>
+//       <Route path="api2" element={<Api2/>}/>
+//       <Route path="ObdScanReport" element={<ObdScanReport/>}/>
+//       <Route path="BikeMakeList" element={<BikeMakeList/>}/>
+//       <Route path="UsersTable" element={<UsersTable/>}/>
+//       <Route path="CommandFetcher" element={<CommandFetcher/>}/>
+//       <Route path="Customcommands1" element={<Customcommands1/>}/>
+//       <Route path="ActuationFetcher" element={<ActuationFetcher/>}/>
+//       {/* <Route path="CommandFetcher" element={<CommandFetcher/>}/> */}
+//       <Route path="ModelListPage" element={<ModelListPage/>}/>
+//       <Route path="OdometerDetails" element={<OdometerDetails/>}/>
+//       <Route path="Updatecommand" element={<FileUploader/>}/>
+//     </Route>
+//     </Routes>
+//     </BrowserRouter>
+
+
+
+//   )
+// }
+
+// export default App
+
+
+
+
+
 
 
 
@@ -18,28 +56,25 @@ import ObdScanReport from "./Services/Scandetail.tsx";
 function App() {
   return (
     <BrowserRouter>
-    <Routes>
-    <Route path="/" element={<Layout/>}>
-      {/* <Route path="/" element={<Sidebar/>}/> */}
-      <Route path="api1" element={<Api1/>}/>
-      <Route path="api2" element={<Api2/>}/>
-      <Route path="ObdScanReport" element={<ObdScanReport/>}/>
-      <Route path="BikeMakeList" element={<BikeMakeList/>}/>
-      <Route path="UsersTable" element={<UsersTable/>}/>
-      <Route path="CommandFetcher" element={<CommandFetcher/>}/>
-      <Route path="Customcommands1" element={<Customcommands1/>}/>
-      <Route path="ActuationFetcher" element={<ActuationFetcher/>}/>
-      {/* <Route path="CommandFetcher" element={<CommandFetcher/>}/> */}
-      <Route path="ModelListPage" element={<ModelListPage/>}/>
-      <Route path="OdometerDetails" element={<OdometerDetails/>}/>
-      <Route path="Updatecommand" element={<FileUploader/>}/>
-    </Route>
-    </Routes>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route path="api1" element={<Api1 />} />
+          <Route path="api2" element={<Api2 />} />
+          <Route path="ObdScanReport" element={<ObdScanReport />} />
+          <Route path="ObdScanReport/details" element={<ScanDetailPage />} /> {/* ✅ NEW */}
+          <Route path="BikeMakeList" element={<BikeMakeList />} />
+          <Route path="UsersTable" element={<UsersTable />} />
+          <Route path="CommandFetcher" element={<CommandFetcher />} />
+          <Route path="Customcommands1" element={<Customcommands1 />} />
+          <Route path="ActuationFetcher" element={<ActuationFetcher />} />
+          <Route path="ModelListPage" element={<ModelListPage />} />
+          <Route path="OdometerDetails" element={<OdometerDetails />} />
+          <Route path="Updatecommand" element={<FileUploader />} />
+        </Route>
+      </Routes>
     </BrowserRouter>
-
-
-
-  )
+  );
 }
+
 
 export default App
