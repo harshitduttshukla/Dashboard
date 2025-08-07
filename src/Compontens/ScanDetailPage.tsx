@@ -1,4 +1,4 @@
-// Services/ScanDetailPage.tsx
+
 import { useLocation, useNavigate } from "react-router-dom";
 import ScanDcodeArr from "../Compontens/ScanDcodeArr";
 
