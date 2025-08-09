@@ -4,7 +4,7 @@ import Api2 from "./Services/Api2";
 import BikeMakeList from './Services/BikeMakeList.tsx'
 import ModelListPage from './Services/ModelListPage.tsx'
 import Customcommands1 from './Services/Customcommands1.tsx'
-import Layout from "./Layout";
+import Layout from "./Compontens/Layout.tsx";
 import ActuationFetcher from './Services/ActuationFetcher .tsx'
 import CommandFetcher from './Services/CommandFetcher .tsx'
 import OdometerDetails from './Services/OdometerDetails.tsx'

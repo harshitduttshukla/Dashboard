@@ -1,4 +1,10 @@
+
+
+
+
 import React from 'react';
+import RowAndTitle from '../ReusedCompontets/RowAndTitile';
+import HeaderAndValue from '../ReusedCompontets/HeaderAndValue';
 
 interface DecodedArrayItem {
   pid: string;
@@ -47,14 +53,9 @@ const ScanDcodeArr: React.FC<ScanProps> = ({
     const start = new Date(start_time);
     const end = new Date(end_time);
     const diffInMs = end.getTime() - start.getTime();
-
     if (isNaN(diffInMs)) return 'N/A';
-
     const seconds = Math.floor(diffInMs / 1000);
-    // const minutes = Math.floor(seconds / 60);
-    // const remainingSeconds = seconds % 60;
-
-    return ` ${seconds}s`;
+    return `${seconds}s`;
   };
 
   return (
@@ -66,35 +67,25 @@ const ScanDcodeArr: React.FC<ScanProps> = ({
         <h2 className="text-xl font-semibold mb-3">Scan Details</h2>
         <table className="table-auto border border-collapse w-full text-left">
           <tbody>
-            <tr className="border">
-              <td className="border px-4 py-2 font-medium">Start Time</td>
-              <td className="border px-4 py-2">{start_time}</td>
-              <td className="border px-4 py-2 font-medium">End Time</td>
-              <td className="border px-4 py-2">{end_time}</td>
+            <tr>
+              <RowAndTitle title="Start Time" value={start_time} />
+              <RowAndTitle title="End Time" value={end_time} />
             </tr>
-            <tr className="border">
-              <td className="border px-4 py-2 font-medium">License Plate</td>
-              <td className="border px-4 py-2">{license_plate}</td>
-              <td className="border px-4 py-2 font-medium">Email</td>
-              <td className="border px-4 py-2">{email}</td>
+            <tr>
+              <RowAndTitle title="License Plate" value={license_plate} />
+              <RowAndTitle title="Email" value={email} />
             </tr>
-            <tr className="border">
-              <td className="border px-4 py-2 font-medium">App Version</td>
-              <td className="border px-4 py-2">{app_version}</td>
-              <td className="border px-4 py-2 font-medium">Function</td>
-              <td className="border px-4 py-2">{functiones}</td>
+            <tr>
+              <RowAndTitle title="App Version" value={app_version} />
+              <RowAndTitle title="Function" value={functiones} />
             </tr>
-            <tr className="border">
-              <td className="border px-4 py-2 font-medium">Type</td>
-              <td className="border px-4 py-2">{type}</td>
-              <td className="border px-4 py-2 font-medium">Scan Duration</td>
-              <td className="border px-4 py-2">{calculateDuration()}</td>
+            <tr>
+              <RowAndTitle title="Type" value={type} />
+              <RowAndTitle title="Scan Duration" value={calculateDuration()} />
             </tr>
-            <tr className="border">
-              <td className="border px-4 py-2 font-medium">Row Count</td>
-              <td className="border px-4 py-2" >{ScanArray?.length || 0}</td>
-              <td className="border px-4 py-2 font-medium">Scan Ended</td>
-              <td className="border px-4 py-2 ">{scan_ended}</td>
+            <tr>
+              <RowAndTitle title="Row Count" value={ScanArray?.length || 0} />
+              <RowAndTitle title="Scan Ended" value={scan_ended} />
             </tr>
           </tbody>
         </table>
@@ -107,21 +98,21 @@ const ScanDcodeArr: React.FC<ScanProps> = ({
           <table className="table-auto w-full border border-collapse text-left">
             <thead className="bg-gray-100">
               <tr>
-                <th className="border px-4 py-2">System</th>
-                <th className="border px-4 py-2">PID</th>
-                <th className="border px-4 py-2">Protocol</th>
-                <th className="border px-4 py-2">Header</th>
-                <th className="border px-4 py-2">Decoded Faults</th>
-                <th className="border px-4 py-2">Data</th>
+                <HeaderAndValue header={true} Title="System" />
+                <HeaderAndValue header={true} Title="PID" />
+                <HeaderAndValue header={true} Title="Protocol" />
+                <HeaderAndValue header={true} Title="Header" />
+                <HeaderAndValue header={true} Title="Decoded Faults" />
+                <HeaderAndValue header={true} Title="Data" />
               </tr>
             </thead>
             <tbody>
               {DecodeArray.map((decoded, idx) => (
                 <tr key={idx} className="hover:bg-gray-50">
-                  <td className="border px-4 py-2">{decoded.system}</td>
-                  <td className="border px-4 py-2">{decoded.pid}</td>
-                  <td className="border px-4 py-2">{decoded.protocol}</td>
-                  <td className="border px-4 py-2">{decoded.header}</td>
+                  <HeaderAndValue Title={decoded.system} />
+                  <HeaderAndValue Title={decoded.pid} />
+                  <HeaderAndValue Title={decoded.protocol} />
+                  <HeaderAndValue Title={decoded.header} />
                   <td className="border px-4 py-2">
                     <ul className="list-disc pl-5">
                       {Object.entries(decoded.decodedFaultArray).map(([code, status]) => (
@@ -131,7 +122,7 @@ const ScanDcodeArr: React.FC<ScanProps> = ({
                       ))}
                     </ul>
                   </td>
-                  <td className="border px-4 py-2">{decoded.data}</td>
+                  <HeaderAndValue Title={decoded.data} />
                 </tr>
               ))}
             </tbody>
@@ -148,23 +139,23 @@ const ScanDcodeArr: React.FC<ScanProps> = ({
           <table className="table-auto w-full border border-collapse text-left">
             <thead className="bg-gray-100">
               <tr>
-                <th className="border px-4 py-2">System</th>
-                <th className="border px-4 py-2">PID</th>
-                <th className="border px-4 py-2">Make</th>
-                <th className="border px-4 py-2">Header</th>
-                <th className="border px-4 py-2">Protocol</th>
-                <th className="border px-4 py-2">Data</th>
+                <HeaderAndValue header={true} Title="System" />
+                <HeaderAndValue header={true} Title="PID" />
+                <HeaderAndValue header={true} Title="Make" />
+                <HeaderAndValue header={true} Title="Header" />
+                <HeaderAndValue header={true} Title="Protocol" />
+                <HeaderAndValue header={true} Title="Data" />
               </tr>
             </thead>
             <tbody>
               {ScanArray.map((item, index) => (
                 <tr key={index} className="hover:bg-gray-50">
-                  <td className="border px-4 py-2">{item.system}</td>
-                  <td className="border px-4 py-2">{item.pid}</td>
-                  <td className="border px-4 py-2">{item.make}</td>
-                  <td className="border px-4 py-2">{item.header}</td>
-                  <td className="border px-4 py-2">{item.protocol}</td>
-                  <td className="border px-4 py-2">{item.data}</td>
+                  <HeaderAndValue Title={item.system} />
+                  <HeaderAndValue Title={item.pid} />
+                  <HeaderAndValue Title={item.make} />
+                  <HeaderAndValue Title={item.header} />
+                  <HeaderAndValue Title={item.protocol} />
+                  <HeaderAndValue Title={item.data} />
                 </tr>
               ))}
             </tbody>

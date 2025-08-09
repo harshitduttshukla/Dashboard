@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import HeaderAndValue from '../ReusedCompontets/HeaderAndValue';
 
 interface DecodedArrayItem {
   pid: string;
@@ -135,38 +136,37 @@ const Scandetail = () => {
       <table className="min-w-full bg-white border border-gray-200 text-sm">
         <thead>
           <tr>
-            <th className="border px-4 py-2">Email</th>
-            <th className="border px-4 py-2">Start Time</th>
-            <th className="border px-4 py-2">End Time</th>
-            <th className="border px-4 py-2">Model</th>
-            <th className="border px-4 py-2">License Plate</th>
-            <th className="border px-4 py-2">VIN</th>
-            <th className="border px-4 py-2">Scan Ended</th>
-            <th className="border px-4 py-2">Make</th>
-            <th className="border px-4 py-2">Country</th>
-            <th className="border px-4 py-2">Funtion</th>
-
-            <th className="border px-4 py-2">Type</th>
-            <th className="border px-4 py-2">App Version</th>
-            <th className="border px-4 py-2">PDF Report</th>
-            <th className="border px-4 py-2">Show</th>
+            <HeaderAndValue header={true} Title="Email" />
+            <HeaderAndValue header={true} Title="Start Time" />
+            <HeaderAndValue header={true} Title="End Time" />
+            <HeaderAndValue header={true} Title="Model" />
+            <HeaderAndValue header={true} Title="License Plate" />
+            <HeaderAndValue header={true} Title="VIN" />
+            <HeaderAndValue header={true} Title="Scan Ended" />
+            <HeaderAndValue header={true} Title="Make" />
+            <HeaderAndValue header={true} Title="Country" />
+            <HeaderAndValue header={true} Title="Funtion" />
+            <HeaderAndValue header={true} Title="Type" />
+            <HeaderAndValue header={true} Title="App Version" />
+            <HeaderAndValue header={true} Title="PDF Report" />
+            <HeaderAndValue header={true} Title="Show" />
           </tr>
         </thead>
         <tbody>
           {scans.map((scan) => (
             <tr key={scan.id}>
-              <td className="border px-4 py-2">{scan.email}</td>
-              <td className="border px-4 py-2">{new Date(scan.scan_start_time).toLocaleString()}</td>
-              <td className="border px-4 py-2">{new Date(scan.scan_end_time).toLocaleString()}</td>
-              <td className="border px-4 py-2">{scan.model}</td>
-              <td className="border px-4 py-2">{scan.license_plate}</td>
-              <td className="border px-4 py-2">{scan.vin}</td>
-              <td className="border px-4 py-2">{scan.scan_ended}</td>
-              <td className="border px-4 py-2">{scan.make}</td>
-              <td className="border px-4 py-2">{scan.country_id}</td>
-              <td className="border px-4 py-2">{scan.function}</td>
-              <td className="border px-4 py-2">{scan.type}</td>
-              <td className="border px-4 py-2">{scan.app_version}</td>
+              <HeaderAndValue Title={scan.email} />
+              <HeaderAndValue Title={new Date(scan.scan_start_time).toLocaleString()} />
+              <HeaderAndValue Title={new Date(scan.scan_end_time).toLocaleString()} />
+              <HeaderAndValue Title={scan.model} />
+              <HeaderAndValue Title={scan.license_plate} />
+              <HeaderAndValue Title={scan.vin} />
+              <HeaderAndValue Title={scan.scan_ended} />
+              <HeaderAndValue Title={scan.make} />
+              <HeaderAndValue Title={scan.country_id} />
+              <HeaderAndValue Title={scan.function} />
+              <HeaderAndValue Title={scan.type} />
+              <HeaderAndValue Title={scan.app_version} />
               <td className="border px-4 py-2">
                 {scan.pdf_report ? (
                   <a
@@ -188,14 +188,14 @@ const Scandetail = () => {
                       state: {
                         ScanArray: scan.scanResArray,
                         DecodeArray: scan.decodedArray,
-                        start_time : scan.scan_start_time,
-                        end_time : scan.scan_end_time,
-                        license_plate : scan.scan_end_time,
-                        email : scan.email,
-                        App_version : scan.app_version,
-                        scan_ended : scan.scan_ended,
-                        functiones : scan.function,
-                        type : scan.type
+                        start_time: scan.scan_start_time,
+                        end_time: scan.scan_end_time,
+                        license_plate: scan.scan_end_time,
+                        email: scan.email,
+                        App_version: scan.app_version,
+                        scan_ended: scan.scan_ended,
+                        functiones: scan.function,
+                        type: scan.type
                       },
                     })
                   }
