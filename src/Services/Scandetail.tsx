@@ -52,6 +52,7 @@ interface Filters {
 }
 
 const ITEMS_PER_PAGE = 30;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/";
 
 const Scandetail = () => {
   const [scans, setScans] = useState<ScanItem[]>([]);
@@ -71,6 +72,7 @@ const Scandetail = () => {
   const [total, setTotal] = useState(0);
   const navigate = useNavigate();
 
+
   const fetchData = async () => {
     try {
       const params = new URLSearchParams({
@@ -79,7 +81,7 @@ const Scandetail = () => {
         ...filters,
       });
 
-      const response = await fetch(`http://localhost:3000/api/ScanDetail?${params.toString()}`);
+      const response = await fetch(`${API_BASE_URL}api/ScanDetail?${params.toString()}`);
 
       if (!response.ok) throw new Error('Failed to fetch scan report');
 

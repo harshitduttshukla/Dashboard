@@ -56,6 +56,18 @@ function Sidebar() {
          ObdScanReport
         </NavLink>
         <NavLink
+          to="/SpecilaFunction"
+          className={({ isActive }) =>
+            `block px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200 ${
+              isActive
+                ? 'bg-blue-500 text-white shadow'
+                : 'text-gray-700 hover:bg-blue-100'
+            }`
+          }
+        >
+         SpecilaFunction
+        </NavLink>
+        <NavLink
           to="/Customcommands1"
           className={({ isActive }) =>
             `block px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200 ${
