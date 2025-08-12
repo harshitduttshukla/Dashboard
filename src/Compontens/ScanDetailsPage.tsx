@@ -1,6 +1,6 @@
 
 import { useLocation, useNavigate } from "react-router-dom";
-import ScanDcodeArr from "../Compontens/ScanDcodeArr";
+import ScanDcodeArr from "./ScanDcodeArr";
 
 const ScanDetailPage = () => {
   const location = useLocation();
@@ -24,3 +24,49 @@ const ScanDetailPage = () => {
 };
 
 export default ScanDetailPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import { useLocation, useNavigate } from "react-router-dom";
+
+// interface DetailsPageProps {
+//   title?: string;
+//   RenderComponent: React.ComponentType<any>;
+// }
+
+// const DetailsPage: React.FC<DetailsPageProps> = ({ title = "Details", RenderComponent }) => {
+//   const location = useLocation();
+//   const navigate = useNavigate();
+//   const stateData = location.state || {};
+
+//   return (
+//     <div className="p-4 ml-7">
+//       <button
+//         onClick={() => navigate(-1)}
+//         className="mb-4 bg-gray-300 px-4 py-2 rounded"
+//       >
+//         ⬅ Back
+//       </button>
+
+//       <h1 className="text-xl font-bold mb-2 ml-6">{title}</h1>
+
+//       <RenderComponent {...stateData} />
+//     </div>
+//   );
+// };
+
+// export default DetailsPage;

@@ -1,70 +1,3 @@
-// import { useEffect, useState } from "react";
-// const ITEMS_PER_PAGE = 30;
-// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/";
-
-
-
-// const SpecilaFunction = () => {
-//     const [sp, setSp] = useState<any>([]);
-//     const [error,setError] = useState<string | null>(null);
-//     const [filters, setFilters] = useState<any>({
-
-//     })
-//     const [page,setPAge] = useState(1);
-//     const [total,setTotal] = useState(0);
-
-//     const fetchData = async () => {
-//         try {
-//             const params = new URLSearchParams({
-//                 page : page.toString(),
-//                 limit : ITEMS_PER_PAGE.toString(),
-//                 ...filters,
-//             })
-
-//             const response = await fetch(`${API_BASE_URL}api/SpecialFunctions?${params.toString()}`)
-
-//             if(!response.ok) throw new Error('Failed to fetch scan report');
-
-//             const json = await response.json();
-//             if(json && Array.isArray(json.scans)){
-//                 setSp(json.scans);
-//                 setTotal(json.total || 0);
-//             }
-//             else{
-//                 setError("Invalid response Format");
-
-//             }            
-//         } catch (error) {
-//             console.error('Fetch error:',error);
-//             setError('Something went wrong');
-            
-//         }
-//     };
-
-//     useEffect(() => {
-//         fetchData();
-//     },[page]);
-
-//     const totalPages = Math.ceil(total/ITEMS_PER_PAGE);
-
-//     return (
-//         <>
-        
-//         </>
-//     )
-
-// }
-
-
-// export default SpecilaFunction;
-
-
-
-// // 
-
-
-
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HeaderAndValue from '../ReusedCompontets/HeaderAndValue';
@@ -83,7 +16,7 @@ interface SpecialFunctionItem {
   scan_start_time: string;
   scan_end_time: string;
   user_email: string;
-  // Add any other fields your backend returns
+  scanResArray: any;
 }
 
 interface Filters {
@@ -158,8 +91,6 @@ const SpecialFunctionsDetail = () => {
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
-
-//   not undestend
   const handleFilterChange = (field: keyof Filters, value: string) => {
     setFilters((prev) => ({ ...prev, [field]: value }));
   };
@@ -169,34 +100,56 @@ const SpecialFunctionsDetail = () => {
       <h2 className="text-xl font-bold mb-4">Special Functions</h2>
       {error && <p className="text-red-500">{error}</p>}
 
+      {/* Filters Section */}
       <div className="flex flex-wrap gap-4 mb-6">
-        {/* not undested this section */}
         {Object.keys(filters).map((key) => (
-          <input
-            key={key}
-            type={key.includes('time') ? 'date' : key === 'hard_coded' ? 'checkbox' : 'text'}
-            placeholder={key}
-            className="border border-gray-300 px-4 py-2 rounded-md w-52 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={filters[key as keyof Filters]}
-            onChange={(e) =>
-              handleFilterChange(
-                key as keyof Filters,
-                key === 'hard_coded' ? (e.target as HTMLInputElement).checked.toString() : e.target.value
-              )
-            }
-          />
+          <div key={key} className="flex flex-col w-52">
+            <label className="mb-1 font-semibold capitalize">
+              {key.replace(/_/g, ' ')}
+            </label>
+            <input
+              type={
+                key.includes('time')
+                  ? 'date'
+                  : key === 'hard_coded'
+                  ? 'checkbox'
+                  : 'text'
+              }
+              placeholder={key.replace(/_/g, ' ')}
+              className="border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={
+                key === 'hard_coded'
+                  ? undefined
+                  : filters[key as keyof Filters]
+              }
+              checked={
+                key === 'hard_coded'
+                  ? filters[key as keyof Filters] === 'true'
+                  : undefined
+              }
+              onChange={(e) =>
+                handleFilterChange(
+                  key as keyof Filters,
+                  key === 'hard_coded'
+                    ? (e.target as HTMLInputElement).checked.toString()
+                    : e.target.value
+                )
+              }
+            />
+          </div>
         ))}
         <button
           onClick={() => {
             setPage(1);
             fetchData();
           }}
-          className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition-all"
+          className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition-all self-end"
         >
           Filter
         </button>
       </div>
 
+      {/* Table */}
       <table className="min-w-full bg-white border border-gray-200 text-sm">
         <thead>
           <tr>
@@ -236,9 +189,7 @@ const SpecialFunctionsDetail = () => {
                 <button
                   onClick={() =>
                     navigate('/SpecialFunctions/details', {
-                      state: {
-                        arrayData: item, // you can replace with actual array fields later
-                      },
+                      state: { ScanArray: item.scanResArray },
                     })
                   }
                   className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
@@ -251,7 +202,7 @@ const SpecialFunctionsDetail = () => {
         </tbody>
       </table>
 
-        {/*not undestend this section*/}
+      {/* Pagination */}
       <div className="mt-4 flex justify-center items-center space-x-2">
         <button
           className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
