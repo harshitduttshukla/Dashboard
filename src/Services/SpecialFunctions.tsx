@@ -189,7 +189,14 @@ const SpecialFunctionsDetail = () => {
                 <button
                   onClick={() =>
                     navigate('/SpecialFunctions/details', {
-                      state: { ScanArray: item.scanResArray },
+                      state: { 
+                        ScanArray: item.scanResArray,
+                        start_time : item.scan_start_time,
+                        end_time : item.scan_end_time,
+                        email : item.user_email,
+                        make : item.make,
+
+                       },
                     })
                   }
                   className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"

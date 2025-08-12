@@ -5,9 +5,8 @@ import SpscanArr from "./SpscanArr";
 const ScanDetailPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-//   const { ScanArray, DecodeArray,start_time,end_time,license_plate,email,App_version,scan_ended,functiones,type } = location.state || {};
-  const { ScanArray } = location.state || {};
-
+  const { ScanArray, start_time,end_time,email, make } = location.state || {};
+  
   return (
     <div className="p-4 ml-7">
       <button
@@ -20,7 +19,7 @@ const ScanDetailPage = () => {
       <h1 className="text-xl font-bold mb-2 ml-6">Scan Array Details</h1>
 
       
-      <SpscanArr ScanArray= {ScanArray}/>
+      <SpscanArr ScanArray= {ScanArray} start_time={start_time} end_time={end_time} email={email} make={make}/>
 
     </div>
   );

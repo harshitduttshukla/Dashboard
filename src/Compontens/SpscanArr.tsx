@@ -1,10 +1,28 @@
 import HeaderAndValue from "../ReusedCompontets/HeaderAndValue"
+import RowAndTitle from "../ReusedCompontets/RowAndTitile";
 
 
-const SpscanArr:React.FC<any>  = ({ScanArray}) => {
+const SpscanArr:React.FC<any>  = ({ScanArray,start_time,end_time,email,make}) => {
+  // console.log("make",make);
+  
 
     return (
         <div>
+          <section className="mb-10">
+        <h2 className="text-xl font-semibold mb-3">Scan Details</h2>
+        <table className="table-auto border border-collapse w-full text-left">
+          <tbody>
+            <tr>
+              <RowAndTitle title="Start Time" value={start_time} />
+              <RowAndTitle title="End Time" value={end_time} />
+            </tr>
+            <tr>
+              <RowAndTitle title="Make" value={make} />
+              <RowAndTitle title="Email" value={email} />
+            </tr>
+          </tbody>
+        </table>
+      </section>
           <section>
         <h2 className="text-xl font-semibold mb-3">Raw Scan Results</h2>
         {ScanArray && ScanArray.length > 0 ? (
