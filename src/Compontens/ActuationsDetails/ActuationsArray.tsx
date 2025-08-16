@@ -1,9 +1,9 @@
-import HeaderAndValue from "../ReusedCompontets/HeaderAndValue"
-import RowAndTitle from "../ReusedCompontets/RowAndTitile";
+import HeaderAndValue from "../../ReusedCompontets/HeaderAndValue"
+import RowAndTitle from "../../ReusedCompontets/RowAndTitile";
 
 
-const SpscanArr:React.FC<any>  = ({ScanArray,start_time,end_time,email,make}) => {
-  // console.log("make",make);
+const ActuationArray:React.FC<any>  = ({ScanArray, created_at, updated_at, email, make,  model}) => {
+  console.log("make",make);
   
 
     return (
@@ -13,12 +13,16 @@ const SpscanArr:React.FC<any>  = ({ScanArray,start_time,end_time,email,make}) =>
         <table className="table-auto border border-collapse w-full text-left">
           <tbody>
             <tr>
-              <RowAndTitle title="Start Time" value={start_time} />
-              <RowAndTitle title="End Time" value={end_time} />
+              <RowAndTitle title="Created_At" value={created_at} />
+              <RowAndTitle title="Updated_At" value={updated_at} />
             </tr>
             <tr>
               <RowAndTitle title="Make" value={make} />
               <RowAndTitle title="Email" value={email} />
+            </tr>
+            <tr>
+              <RowAndTitle title="Model" value={model} />
+              
             </tr>
           </tbody>
         </table>
@@ -29,16 +33,16 @@ const SpscanArr:React.FC<any>  = ({ScanArray,start_time,end_time,email,make}) =>
           <table className="table-auto w-full border border-collapse text-left">
             <thead className="bg-gray-100">
               <tr>
-                <HeaderAndValue header={true} Title="Data" />
                 <HeaderAndValue header={true} Title="PID" />
+                <HeaderAndValue header={true} Title="Data" />
                 <HeaderAndValue header={true} Title="Input" />
               </tr>
             </thead>
             <tbody>
               {ScanArray.map((item:any, index:number) => (
                 <tr key={index} className="hover:bg-gray-50">
-                  <HeaderAndValue Title={item.data} />
                   <HeaderAndValue Title={item.pid} />
+                  <HeaderAndValue Title={item.data} />
                   <HeaderAndValue Title={item?.input} />
                   
                 </tr>
@@ -59,7 +63,7 @@ const SpscanArr:React.FC<any>  = ({ScanArray,start_time,end_time,email,make}) =>
 
 
 
-export default SpscanArr;
+export default ActuationArray;
 
 
 

@@ -1,10 +1,6 @@
-
-
-
-
 import React from 'react';
-import RowAndTitle from '../ReusedCompontets/RowAndTitile';
-import HeaderAndValue from '../ReusedCompontets/HeaderAndValue';
+import RowAndTitle from '../..//ReusedCompontets/RowAndTitile';
+import HeaderAndValue from '../..//ReusedCompontets/HeaderAndValue';
 
 interface DecodedArrayItem {
   pid: string;

@@ -11,9 +11,11 @@ import OdometerDetails from './Services/OdometerDetails.tsx'
 import FileUploader from './Services/Updatecommand.tsx'
 import UsersTable from "./Services/UsersTable.tsx";
 import ObdScanReport from "./Services/Scandetail.tsx";
-import ScanDetailPage from "./Compontens/ScanDetailsPage.tsx"; 
-import SpdetailsPage from "./Compontens/SpdetailsPage.tsx"; 
-import SpecilaFunction from "./Services/SpecialFunctions.tsx"; 
+import ScanDetailPage from "./Compontens/ScanDetails/ScanDetailsPage.tsx"; 
+import SpdetailsPage from "./Compontens/SpecialFunctions/SpdetailsPage.tsx"; 
+import ActuationsDetailpage from "./Compontens/ActuationsDetails/ActuationsDetailpage.tsx"; 
+import SpecilaFunction from "./Services/SpecialFunctions.tsx";
+import ActuationsDetail from "./Services/ActuationsDetail.tsx";
 
 
 
@@ -27,7 +29,9 @@ function App() {
           <Route path="ObdScanReport" element={<ObdScanReport />} />
           <Route path="ObdScanReport/details" element={<ScanDetailPage />} />
           <Route path="SpecilaFunction" element={<SpecilaFunction />} />
-          <Route path="/SpecialFunctions/details" element={<SpdetailsPage />} />
+          <Route path="SpecialFunctions/details" element={<SpdetailsPage />} />
+          <Route path="ActuationsDetail" element={<ActuationsDetail />} />
+          <Route path="ActuationsDetail/details" element={<ActuationsDetailpage />} />
           <Route path="BikeMakeList" element={<BikeMakeList />} />
           <Route path="UsersTable" element={<UsersTable />} />
           <Route path="CommandFetcher" element={<CommandFetcher />} />

@@ -1,6 +1,6 @@
 
 import { useLocation, useNavigate } from "react-router-dom";
-import SpscanArr from "./SpscanArr";
+import SpscanArr from "../SpecialFunctions/SpscanArr";
 
 const ScanDetailPage = () => {
   const location = useLocation();

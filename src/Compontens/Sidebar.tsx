@@ -177,6 +177,7 @@ const menuItems: MenuItem[] = [
   { label: "Service for Scan Car", path: "/Api2" },
   { label: "Obd Scan Report", path: "/ObdScanReport" },
   { label: "Special Function", path: "/SpecilaFunction" },
+  { label: "Actuations Detail", path: "/ActuationsDetail" },
   { label: "Custom commands", path: "/Customcommands1" },
   { label: "ActuationFetcher", path: "/ActuationFetcher" },
   { label: "CommandFetcher", path: "/CommandFetcher" },
