@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
 
 
 const OdometerDetails: React.FC = () => {
@@ -19,9 +19,8 @@ const OdometerDetails: React.FC = () => {
     setError("");
 
     try {
-      const originalUrl = `http://13.202.193.4:3000/api/fetch_odometer?make=${make}&model=${model}&year=${year}`;
-      const url = `https://api.allorigins.win/get?url=${encodeURIComponent(originalUrl)}`;
-      // const url = `${API_BASE_URL}api/fetch_odometer?make=${encodeURIComponent(make)}&model${encodeURIComponent(model)}&year=${year}`;
+      
+      const url = `${API_BASE_URL}api/fetch_odometer?make=${encodeURIComponent(make)}&model${encodeURIComponent(model)}&year=${year}`;
 
       const response = await fetch(url);
       const result = await response.json();

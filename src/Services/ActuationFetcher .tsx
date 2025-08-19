@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
 
 
 const ActuationFetcher = () => {
@@ -21,10 +21,9 @@ const ActuationFetcher = () => {
 
     setLoading(true);
 
-    const originalUrl = `http://13.202.193.4:3000/api/fetch_actuation_command?make=${make}&model=${model}&year=${year}`;
-    const url = `https://api.allorigins.win/get?url=${encodeURIComponent(originalUrl)}`;
+    
 
-    // const url = `${API_BASE_URL}api/fetch_actuation_command?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&year=${year}`
+    const url = `${API_BASE_URL}api/fetch_actuation_command?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&year=${year}`
 
     try {
       const res = await fetch(url);

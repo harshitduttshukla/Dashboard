@@ -30,7 +30,7 @@ interface Filters {
 
 const ITEMS_PER_PAGE = 30;
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/";
+  import.meta.env.VITE_API_BASE_URL 
 
 const ActuationsDetail = () => {
   const [actuationsData, setActuationsData] = useState<ActuationItem[]>([]);

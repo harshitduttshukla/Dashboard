@@ -52,7 +52,7 @@ interface Filters {
 }
 
 const ITEMS_PER_PAGE = 30;
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
 
 const Scandetail = () => {
   const [scans, setScans] = useState<ScanItem[]>([]);
