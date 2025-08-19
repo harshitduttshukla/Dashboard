@@ -12,11 +12,15 @@ interface Filters {
   status: string;
 }
 
+const ITEMS_PER_PAGE = 20; 
+
 const UsersTable: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [filters, setFilters] = useState<Filters>({ email: '', plan: '', status: '' });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -28,6 +32,10 @@ const UsersTable: React.FC = () => {
       if (filters.plan) params.append('plan', filters.plan);
       if (filters.status) params.append('status', filters.status);
 
+     
+      params.append('page', page.toString());
+      params.append('limit', ITEMS_PER_PAGE.toString());
+
       const response = await fetch(`${API_BASE_URL}api/users?${params.toString()}`);
 
       if (!response.ok) {
@@ -36,6 +44,7 @@ const UsersTable: React.FC = () => {
 
       const data = await response.json();
       setUsers(data.users || []);
+      setTotal(data.total || 0); // है
     } catch (err) {
       console.error('Fetch error:', err);
       setError("Failed to fetch users");
@@ -46,12 +55,12 @@ const UsersTable: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [page]); // ✅ page बदलते ही API call होगी
+
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   return (
     <div className="flex min-h-screen bg-gray">
-      {/* <Sidebar /> */}
-
       <div className="flex-1 p-8">
         <h2 className="text-3xl font-bold text-gray-800 mb-6 ml-6">User List</h2>
 
@@ -79,7 +88,7 @@ const UsersTable: React.FC = () => {
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
           />
           <button
-            onClick={fetchUsers}
+            onClick={() => { setPage(1); fetchUsers(); }}
             className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition-all"
           >
             Filter
@@ -124,6 +133,29 @@ const UsersTable: React.FC = () => {
               </tbody>
             </table>
           )}
+        </div>
+
+        {/* ✅ Pagination controls */}
+        <div className="mt-4 flex justify-center items-center space-x-2">
+          <button
+            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+
+          <span className="font-semibold">
+            Page {page} of {totalPages || 1}
+          </span>
+
+          <button
+            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>
