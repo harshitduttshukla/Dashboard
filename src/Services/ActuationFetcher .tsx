@@ -23,7 +23,9 @@ const ActuationFetcher = () => {
 
     
 
-    const url = `${API_BASE_URL}api/fetch_actuation_command?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&year=${year}`
+    const url = `${API_BASE_URL}api/fetch_actuation_command?make=${make}&model=${model}&year=${year}`
+    // const url = `http://13.202.193.4:3000/api/fetch_actuation_command?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&year=${year}`
+    // const url = `http://13.202.193.4:3000/api/fetch_actuation_command?make=Mahindra&model=Tuv300&year=2020`
 
     try {
       const res = await fetch(url);
