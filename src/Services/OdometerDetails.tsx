@@ -1,140 +1,7 @@
-
-
-// import React, { useEffect, useState } from "react";
-
-
-// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
-
-
-// const OdometerDetails: React.FC = () => {
-//   const [odometerData, setOdometerData] = useState<any[]>([]);
-//   const [loading, setLoading] = useState<boolean>(false);
-//   const [error, setError] = useState<string>("");
-//   const [make, setMake] = useState<string>("Mahindra");  // Default make
-//   const [model, setModel] = useState<string>("Bolero");  // Default model
-//   const [year, setYear] = useState<string>("2021");      // Default year
-
-//   const fetchOdometerData = async () => {
-//     setLoading(true);
-//     setError("");
-
-//     try {
-      
-//       const url = `${API_BASE_URL}api/fetch_odometer?make=${encodeURIComponent(make)}&model${encodeURIComponent(model)}&year=${year}`;
-
-//       const response = await fetch(url);
-//       const result = await response.json();
-
-//       if (result.contents) {
-//         const json = JSON.parse(result.contents);
-
-//         if (json.data && Array.isArray(json.data)) {
-//           setOdometerData(json.data);
-//         } else {
-//           setOdometerData([]);
-//           setError("No odometer data found.");
-//         }
-//       } else {
-//         setOdometerData([]);
-//         setError("Invalid response from proxy.");
-//       }
-//     } catch (err) {
-//       console.error("Error fetching odometer data:", err);
-//       setOdometerData([]);
-//       setError("Failed to fetch odometer data. Please try again.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   // Function to handle make, model, and year input changes
-//   const handleInputChange = (
-//     e: React.ChangeEvent<HTMLInputElement>,
-//     type: string
-//   ) => {
-//     if (type === "make") setMake(e.target.value);
-//     if (type === "model") setModel(e.target.value);
-//     if (type === "year") setYear(e.target.value);
-//   };
-
-//   // Fetch odometer data when component mounts or input changes
-//   useEffect(() => {
-//     fetchOdometerData();
-//   }, [make, model, year]);
-
-//   return (
-//     <div className="max-w-3xl mx-auto p-6">
-//       <h1 className="text-2xl font-bold text-center text-green-700 mb-4">
-//         Odometer Details
-//       </h1>
-
-//       <div className="mb-4">
-//         <label className="block text-gray-700">Make:</label>
-//         <input
-//           type="text"
-//           value={make}
-//           onChange={(e) => handleInputChange(e, "make")}
-//           className="w-full p-2 mt-2 border border-gray-300 rounded"
-//         />
-//       </div>
-
-//       <div className="mb-4">
-//         <label className="block text-gray-700">Model:</label>
-//         <input
-//           type="text"
-//           value={model}
-//           onChange={(e) => handleInputChange(e, "model")}
-//           className="w-full p-2 mt-2 border border-gray-300 rounded"
-//         />
-//       </div>
-
-//       <div className="mb-4">
-//         <label className="block text-gray-700">Year:</label>
-//         <input
-//           type="text"
-//           value={year}
-//           onChange={(e) => handleInputChange(e, "year")}
-//           className="w-full p-2 mt-2 border border-gray-300 rounded"
-//         />
-//       </div>
-
-//       <button
-//         onClick={fetchOdometerData}
-//         className="w-full bg-green-500 text-white p-2 rounded"
-//       >
-//         Fetch Odometer Data
-//       </button>
-
-//       {loading && <p className="text-blue-500 text-center">Loading odometer data...</p>}
-//       {error && <p className="text-red-500 text-center">{error}</p>}
-
-//       {!loading && odometerData.length > 0 && (
-//         <div className="border border-gray-300 rounded p-4 shadow-sm">
-//           <ul className="list-disc list-inside text-gray-700 space-y-1">
-//             {odometerData.map((item, idx) => (
-//               <li key={idx}>
-//                 <strong>Header:</strong> {item.header} <br />
-//                 <strong>PID:</strong> {item.pid} <br />
-//                 <strong>Formula (Metric):</strong> {item.formula_metric} <br />
-//                 <strong>Formula (Imperial):</strong> {item.formula_imperial} <br />
-//                 <strong>Unit (Metric):</strong> {item.unit_metric} <br />
-//                 <strong>Unit (Imperial):</strong> {item.unit_imperial} <br />
-//                 <strong>System:</strong> {item.system} <br />
-//               </li>
-//             ))}
-//           </ul>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default OdometerDetails;
-
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const ITEMS_PER_PAGE = 10;
 
 const OdometerDetails: React.FC = () => {
   const [odometerData, setOdometerData] = useState<any[]>([]);
@@ -147,147 +14,378 @@ const OdometerDetails: React.FC = () => {
   const [year, setYear] = useState<string>("");
 
   const [page, setPage] = useState<number>(1);
-  const [limit] = useState<number>(10);
   const [total, setTotal] = useState<number>(0);
+  
+  // Add ref to track the current request
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  const fetchOdometerData = async () => {
+  const fetchOdometerData = useCallback(async (targetPage?: number, currentMake?: string, currentModel?: string, currentYear?: string) => {
+    // Cancel previous request if it exists
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    // Create new abort controller for this request
+    abortControllerRef.current = new AbortController();
+
     setLoading(true);
     setError("");
 
+    const currentPage = targetPage ?? page;
+    const searchMake = currentMake !== undefined ? currentMake : make;
+    const searchModel = currentModel !== undefined ? currentModel : model;
+    const searchYear = currentYear !== undefined ? currentYear : year;
+
     try {
       const url = `${API_BASE_URL}api/OdometerAPI?make=${encodeURIComponent(
-        make
-      )}&model=${encodeURIComponent(model)}&year=${encodeURIComponent(
-        year
-      )}&page=${page}&limit=${limit}`;
+        searchMake
+      )}&model=${encodeURIComponent(searchModel)}&year=${encodeURIComponent(
+        searchYear
+      )}&page=${currentPage}&limit=${ITEMS_PER_PAGE}`;
 
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        signal: abortControllerRef.current.signal
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const result = await response.json();
 
       if (Array.isArray(result.data)) {
         setOdometerData(result.data);
         setTotal(typeof result.total === "number" ? result.total : result.data.length);
-        if (result.data.length === 0) setError("No odometer data found.");
+        setError("");
+        if (result.data.length === 0) {
+          if (searchMake || searchModel || searchYear) {
+            setError("No odometer data found for the specified criteria.");
+          } else {
+            setError("No odometer data available.");
+          }
+        }
       } else {
         setOdometerData([]);
         setError("No odometer data found.");
+        setTotal(0);
       }
     } catch (err) {
+      // Don't show error if request was aborted
+      if (err instanceof Error && err.name === 'AbortError') {
+        return;
+      }
+      
       console.error("Error fetching odometer data:", err);
       setOdometerData([]);
       setError("Failed to fetch odometer data. Please try again.");
     } finally {
       setLoading(false);
+      abortControllerRef.current = null;
     }
+  }, []);
+
+  // Fetch on first render - load all data by default
+  useEffect(() => {
+    fetchOdometerData(1);
+  }, []);
+
+  // Handle search button click
+  const handleSearch = () => {
+    setPage(1);
+    fetchOdometerData(1, make, model, year);
   };
 
-  // Auto-fetch on mount and whenever page changes
-  useEffect(() => {
-    fetchOdometerData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
+  // Handle page navigation
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    fetchOdometerData(newPage, make, model, year);
+  };
 
-  const totalPages = Math.max(1, Math.ceil(total / limit));
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
+  const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
 
   return (
-    <div className="flex-1 p-6 ml-5 bg-gray-50 h-screen overflow-auto">
+    <div className="min-h-screen flex flex-col p-6 max-w-full mx-auto">
       <h1 className="text-3xl font-bold text-center text-blue-700 mb-6">
         Odometer Details
       </h1>
 
-      {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <input
-          type="text"
-          value={make}
-          onChange={(e) => setMake(e.target.value)}
-          placeholder="Make"
-          className="p-3 text-base md:text-lg border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <input
-          type="text"
-          value={model}
-          onChange={(e) => setModel(e.target.value)}
-          placeholder="Model"
-          className="p-3 text-base md:text-lg border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <input
-          type="text"
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-          placeholder="Year"
-          className="p-3 text-base md:text-lg border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+      {/* Search box */}
+      <div className="bg-white border rounded-lg shadow-sm p-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <input
+            type="text"
+            value={make}
+            onChange={(e) => setMake(e.target.value)}
+            placeholder="Make"
+            className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="text"
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
+            placeholder="Model"
+            className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="text"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            placeholder="Year"
+            className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
+            onClick={handleSearch}
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Fetch"}
+          </button>
+        </div>
       </div>
 
-      <button
-        onClick={() => {
-          setPage(1);
-          fetchOdometerData();
-        }}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg text-base md:text-lg font-semibold mb-6 shadow"
-      >
-        Fetch Odometer Data
-      </button>
-
-      {loading && <p className="text-blue-600 text-center">Loading...</p>}
-      {error && !loading && <p className="text-red-500 text-center">{error}</p>}
-
-      {!loading && odometerData.length > 0 && (
-        <div className="overflow-auto border rounded-lg shadow bg-white">
-          <table className="w-full border-collapse">
-            <thead className="bg-blue-100 sticky top-0">
-              <tr>
-                <th className="p-3 border text-left">Header</th>
-                <th className="p-3 border text-left">PID</th>
-                <th className="p-3 border text-left">Protocol</th>
-                <th className="p-3 border text-left">System</th>
-                <th className="p-3 border text-left">Formula (Metric)</th>
-                <th className="p-3 border text-left">Formula (Imperial)</th>
-                <th className="p-3 border text-left">Unit (Metric)</th>
-                <th className="p-3 border text-left">Unit (Imperial)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {odometerData.map((item, idx) => (
-                <tr key={idx} className="hover:bg-gray-50">
-                  <td className="p-3 border">{item.header ?? "-"}</td>
-                  <td className="p-3 border">{item.pid ?? "-"}</td>
-                  <td className="p-3 border">{item.protocol ?? "-"}</td>
-                  <td className="p-3 border">{item.system ?? "-"}</td>
-                  <td className="p-3 border">{item.formula_metric ?? "-"}</td>
-                  <td className="p-3 border">{item.formula_imperial ?? "-"}</td>
-                  <td className="p-3 border">{item.unit_metric ?? "-"}</td>
-                  <td className="p-3 border">{item.unit_imperial ?? "-"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {loading && (
+        <div className="text-blue-500 text-center flex items-center justify-center gap-2 py-8">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+          <span className="text-lg">Loading odometer data...</span>
         </div>
       )}
+      {error && <p className="text-red-500 text-center py-4 text-lg">{error}</p>}
 
-      {/* Pagination (centered + close spacing) */}
-      {!loading && odometerData.length > 0 && (
-        <div className="flex justify-center items-center gap-4 mt-4">
+      {/* Data display */}
+      <div className="flex-1 overflow-auto space-y-6">
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-blue-500 text-xl">Loading odometer data...</p>
+              <p className="text-gray-500 mt-2">Please wait while we fetch the data</p>
+            </div>
+          </div>
+        ) : odometerData.length > 0 ? (
+          <div className="bg-white border rounded-lg shadow-sm p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-blue-700">
+                Odometer Data Results
+              </h2>
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                {odometerData.length} items
+              </span>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm border">
+                <thead className="bg-gray-100 text-gray-700">
+                  <tr>
+                    <th className="border px-3 py-2 text-left">Header</th>
+                    <th className="border px-3 py-2 text-left">Sub Header</th>
+                    <th className="border px-3 py-2 text-left">PID</th>
+                    <th className="border px-3 py-2 text-left">Protocol</th>
+                    <th className="border px-3 py-2 text-left">System</th>
+                    <th className="border px-3 py-2 text-left">Init</th>
+                    <th className="border px-3 py-2 text-left">Formula Based</th>
+                    <th className="border px-3 py-2 text-left">Generic</th>
+                    <th className="border px-3 py-2 text-left">Formula (Metric)</th>
+                    <th className="border px-3 py-2 text-left">Formula (Imperial)</th>
+                    <th className="border px-3 py-2 text-left">Unit (Metric)</th>
+                    <th className="border px-3 py-2 text-left">Unit (Imperial)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {odometerData.map((item, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50">
+                      <td className="border px-3 py-2">
+                        {item.header ? (
+                          <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-mono">
+                            {item.header}
+                          </span>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td className="border px-3 py-2">
+                        {item.subHeader ? (
+                          <span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded text-xs font-mono">
+                            {item.subHeader}
+                          </span>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td className="border px-3 py-2">
+                        {item.pid ? (
+                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-mono">
+                            {item.pid}
+                          </span>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td className="border px-3 py-2">
+                        {item.protocol ? (
+                          <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                            {item.protocol}
+                          </span>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td className="border px-3 py-2">
+                        {item.system ? (
+                          <span className="bg-teal-100 text-teal-800 px-2 py-1 rounded text-xs font-semibold">
+                            {item.system}
+                          </span>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td className="border px-3 py-2">
+                        {item.init ? (
+                          <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">
+                            {item.init}
+                          </span>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td className="border px-3 py-2">
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          item.formulaBased 
+                            ? "bg-green-100 text-green-800" 
+                            : "bg-red-100 text-red-800"
+                        }`}>
+                          {item.formulaBased ? "Yes" : "No"}
+                        </span>
+                      </td>
+                      <td className="border px-3 py-2">
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          item.generic 
+                            ? "bg-green-100 text-green-800" 
+                            : "bg-red-100 text-red-800"
+                        }`}>
+                          {item.generic ? "Yes" : "No"}
+                        </span>
+                      </td>
+                      <td className="border px-3 py-2 max-w-xs">
+                        {item.formula_metric ? (
+                          <span className="font-mono text-green-700 bg-green-50 px-2 py-1 rounded text-xs block break-all">
+                            {item.formula_metric}
+                          </span>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td className="border px-3 py-2 max-w-xs">
+                        {item.formula_imperial ? (
+                          <span className="font-mono text-orange-700 bg-orange-50 px-2 py-1 rounded text-xs block break-all">
+                            {item.formula_imperial}
+                          </span>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td className="border px-3 py-2">
+                        {item.unit_metric ? (
+                          <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                            {item.unit_metric}
+                          </span>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td className="border px-3 py-2">
+                        {item.unit_imperial ? (
+                          <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                            {item.unit_imperial}
+                          </span>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : (
+          !error && (
+            <div className="text-center py-20">
+              <div className="text-gray-400 text-6xl mb-4">🚗</div>
+              <p className="text-gray-500 text-xl">No odometer data to display</p>
+              <p className="text-gray-400 mt-2">Try searching with different criteria</p>
+            </div>
+          )
+        )}
+      </div>
+
+      {/* Pagination */}
+      {odometerData.length > 0 && (
+        <div className="flex justify-center items-center gap-4 mt-6">
           <button
-            disabled={page === 1}
-            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50 disabled:hover:bg-blue-600"
+            onClick={() => handlePageChange(Math.max(1, page - 1))}
+            disabled={page === 1 || loading}
+            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition"
           >
             Previous
           </button>
-
-          <span className="text-sm md:text-base font-medium">
-            Page {page} of {totalPages}
-          </span>
+          
+          {/* Page numbers */}
+          <div className="flex gap-2">
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let pageNum;
+              if (totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (page <= 3) {
+                pageNum = i + 1;
+              } else if (page >= totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+              } else {
+                pageNum = page - 2 + i;
+              }
+              
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => handlePageChange(pageNum)}
+                  disabled={loading}
+                  className={`px-3 py-2 rounded transition ${
+                    page === pageNum
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  } disabled:opacity-50`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+          </div>
 
           <button
-            disabled={page >= totalPages}
-            onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50 disabled:hover:bg-blue-600"
+            onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
+            disabled={page === totalPages || loading}
+            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition"
           >
             Next
           </button>
+        </div>
+      )}
+      
+      {totalPages > 0 && (
+        <div className="text-center text-sm text-gray-500 mt-2 bg-white rounded-lg p-4 border">
+          <div className="flex flex-wrap justify-center items-center gap-6">
+            <span>📄 Page {page} of {totalPages}</span>
+            <span>📊 Total Items: {total}</span>
+            <span>🔧 Current Page Items: {odometerData.length}</span>
+          </div>
         </div>
       )}
     </div>

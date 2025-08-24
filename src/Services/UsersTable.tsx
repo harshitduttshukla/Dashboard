@@ -44,7 +44,7 @@ const UsersTable: React.FC = () => {
 
       const data = await response.json();
       setUsers(data.users || []);
-      setTotal(data.total || 0); // है
+      setTotal(data.total || 0); 
     } catch (err) {
       console.error('Fetch error:', err);
       setError("Failed to fetch users");

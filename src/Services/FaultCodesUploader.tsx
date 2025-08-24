@@ -1,19 +1,46 @@
+
+
+
+
+
 import { useState, useCallback } from 'react';
-import { Upload, FileSpreadsheet, CheckCircle, XCircle, AlertCircle, Database, Trash2, Eye } from 'lucide-react';
+import { Upload, FileSpreadsheet, CheckCircle, XCircle, AlertCircle, Database, Trash2, Eye, type LucideIcon } from 'lucide-react';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+// Type definitions
+interface UploadStats {
+  inserted?: number;
+  duplicates?: number;
+  skipped?: number;
+}
 
+interface UploadResult {
+  success: boolean;
+  message: string;
+  stats?: {
+    my_fault_codes?: UploadStats;
+    fault_code_causes?: UploadStats;
+    my_fault_code_symptoms?: UploadStats;
+    my_fault_code_solutions?: UploadStats;
+  };
+}
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL
+interface StatCardProps {
+  title: string;
+  data?: UploadStats;
+  icon: LucideIcon;
+  color: string;
+}
 
 const FaultCodesUploader = () => {
-  const [file, setFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploadResult, setUploadResult] = useState(null);
-  const [error, setError] = useState<string|null>(null);
-  const [dragActive, setDragActive] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [dragActive, setDragActive] = useState<boolean>(false);
 
-  const handleDrop = useCallback((e:any) => {
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
@@ -24,19 +51,19 @@ const FaultCodesUploader = () => {
     }
   }, []);
 
-  const handleDragOver = useCallback((e:any) => {
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(true);
   }, []);
 
-  const handleDragLeave = useCallback((e:any) => {
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
   }, []);
 
-  const handleFileSelect = (selectedFile : any) => {
+  const handleFileSelect = (selectedFile: File) => {
     const allowedTypes = [
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'application/vnd.ms-excel'
@@ -57,8 +84,8 @@ const FaultCodesUploader = () => {
     setUploadResult(null);
   };
 
-  const handleFileInputChange = (e:any) => {
-    const selectedFile = e.target.files[0];
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       handleFileSelect(selectedFile);
     }
@@ -82,8 +109,7 @@ const FaultCodesUploader = () => {
         `${BASE_URL}api/FaultUplodes`, // if running on different port  
       ];
 
-      let response;
-      let lastError;
+      let response: Response | undefined;
 
       for (const endpoint of possibleEndpoints) {
         try {
@@ -97,7 +123,6 @@ const FaultCodesUploader = () => {
             break; // Found a working endpoint
           }
         } catch (e) {
-          lastError = e;
           continue;
         }
       }
@@ -114,25 +139,29 @@ const FaultCodesUploader = () => {
         throw new Error('Server returned an invalid response. Please check server logs.');
       }
 
-      const result = await response.json();
+      const result: UploadResult = await response.json();
 
       if (response.ok && result.success) {
         setUploadResult(result);
         setFile(null);
         // Reset file input
-        const fileInput = document.getElementById('file-input');
+        const fileInput = document.getElementById('file-input') as HTMLInputElement;
         if (fileInput) fileInput.value = '';
       } else {
         throw new Error(result.message || `Server error: ${response.status}`);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Upload error:', err);
-      let errorMessage = err.message;
+      let errorMessage = 'An unknown error occurred';
       
-      if (err.message.includes('Failed to fetch')) {
-        errorMessage = 'Cannot connect to server. Please check if the server is running.';
-      } else if (err.message.includes('JSON')) {
-        errorMessage = 'Server configuration error. Please check server setup.';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+        
+        if (err.message.includes('Failed to fetch')) {
+          errorMessage = 'Cannot connect to server. Please check if the server is running.';
+        } else if (err.message.includes('JSON')) {
+          errorMessage = 'Server configuration error. Please check server setup.';
+        }
       }
       
       setError(errorMessage);
@@ -144,7 +173,7 @@ const FaultCodesUploader = () => {
   const removeFile = () => {
     setFile(null);
     setError(null);
-    const fileInput = document.getElementById('file-input');
+    const fileInput = document.getElementById('file-input') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
   };
 
@@ -153,7 +182,7 @@ const FaultCodesUploader = () => {
     setError(null);
   };
 
-  const formatFileSize = (bytes) => {
+  const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -161,7 +190,7 @@ const FaultCodesUploader = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const StatCard = ({ title, data, icon: Icon, color }) => (
+  const StatCard: React.FC<StatCardProps> = ({ title, data, icon: Icon, color }) => (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-sm font-medium text-gray-700">{title}</h4>

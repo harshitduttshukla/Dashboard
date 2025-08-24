@@ -14,7 +14,7 @@ const menuItems: MenuItem[] = [
   { label: "Actuations Detail", path: "/ActuationsDetail" },
   { label: "Custom commands", path: "/Customcommands1" },
   { label: "Actuation Fetcher", path: "/ActuationFetcher" },
-  { label: "CommandFetcher", path: "/CommandFetcher" },
+  { label: "SPF Commands", path: "/CommandFetcher" },
   { label: "Model List Page", path: "/ModelListPage" },
   { label: "Bike Make List", path: "/BikeMakeList" },
   { label: "Odometer Details", path: "/OdometerDetails" },
