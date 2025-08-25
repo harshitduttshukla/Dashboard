@@ -1,14 +1,10 @@
-
-
-
 import React, { useEffect, useState } from "react";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ModelListPage: React.FC = () => {
   const [makeList] = useState<string[]>([
     "Hyundai",
-    "Maruti",
     "Mahindra",
     "Tata",
     "Honda",
@@ -54,6 +50,16 @@ const ModelListPage: React.FC = () => {
     fetchModels();
   }, [selectedMake]);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedMake(e.target.value);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      fetchModels();
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-bold text-center text-blue-700 mb-4">
@@ -61,28 +67,52 @@ const ModelListPage: React.FC = () => {
       </h1>
 
       <div className="mb-6 text-center">
-        <label className="mr-2 font-medium text-gray-700">Select Make:</label>
-        <select
+        <label className="mr-2 font-medium text-gray-700">Enter Make:</label>
+        <input
+          type="text"
           value={selectedMake}
-          onChange={(e) => setSelectedMake(e.target.value)}
-          className="border px-4 py-2 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          {makeList.map((make) => (
-            <option key={make} value={make}>
-              {make}
-            </option>
-          ))}
-        </select>
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          placeholder="Enter vehicle make (e.g., Mahindra, Hyundai)"
+          className="border px-4 py-2 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+        />
 
         <button
           onClick={fetchModels}
-          className="ml-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          disabled={!selectedMake.trim() || loading}
+          className="ml-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded transition-colors"
         >
-          Refresh
+          {loading ? "Loading..." : "Fetch Models"}
         </button>
       </div>
 
-      {loading && <p className="text-blue-500 text-center">Loading models...</p>}
+      {/* Suggestions for common makes */}
+      <div className="mb-4 text-center">
+        <p className="text-sm text-gray-600 mb-2">Quick suggestions:</p>
+        <div className="flex flex-wrap justify-center gap-2">
+          {makeList.map((make) => (
+            <button
+              key={make}
+              onClick={() => setSelectedMake(make)}
+              className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                selectedMake === make
+                  ? "bg-blue-100 border-blue-300 text-blue-700"
+                  : "bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {make}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {loading && (
+        <div className="text-blue-500 text-center flex items-center justify-center gap-2">
+          <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent"></div>
+          <span>Loading models...</span>
+        </div>
+      )}
+      
       {error && <p className="text-red-500 text-center">{error}</p>}
 
       {!loading && modelList.length > 0 && (
