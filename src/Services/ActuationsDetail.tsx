@@ -1,0 +1,209 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import HeaderAndValue from "../ReusedCompontets/HeaderAndValue";
+
+interface ActuationItem {
+  created_at: string;
+  updated_at: string;
+  actuation_option: string;
+  actuation_type: string;
+  device: string | null;
+  end_date: string | null;
+  input: string | null;
+  product_id: string | null;
+  user_car_model_id: string | null;
+  make: string;
+  model: string;
+  user_email: string | null;
+  scanResArray: any[];
+}
+
+interface Filters {
+  email: string;
+  make: string;
+  model: string;
+  input: string;
+  actuation_type: string;
+  actuation_option: string;
+  user_car_model_id: string;
+}
+
+const ITEMS_PER_PAGE = 30;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL 
+
+const ActuationsDetail = () => {
+  const [actuationsData, setActuationsData] = useState<ActuationItem[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<Filters>({
+    email: "",
+    make: "",
+    model: "",
+    input: "",
+    actuation_type: "",
+    actuation_option: "",
+    user_car_model_id: "",
+  });
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const navigate = useNavigate();
+
+  const fetchData = async () => {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: ITEMS_PER_PAGE.toString(),
+        ...filters,
+      });
+
+      const response = await fetch(
+        `${API_BASE_URL}api/ActuationsDetail?${params.toString()}`
+      );
+
+      if (!response.ok) throw new Error("Failed to fetch actuations data");
+
+      const json = await response.json();
+      if (json && Array.isArray(json.actuations)) {
+        setActuationsData(json.actuations);
+        setTotal(json.total || 0);
+      } else {
+        setError("Invalid response format");
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError("Something went wrong");
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [page]);
+
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+
+  const handleFilterChange = (field: keyof Filters, value: string) => {
+    setFilters((prev) => ({ ...prev, [field]: value }));
+  };
+
+  return (
+    <div className="p-4 ml-8">
+      <h2 className="text-xl font-bold mb-4">Actuations</h2>
+      {error && <p className="text-red-500">{error}</p>}
+
+      {/* Filters Section */}
+      <div className="flex flex-wrap gap-4 mb-6">
+        {Object.keys(filters).map((key) => (
+          <div key={key} className="flex flex-col w-52">
+            <label className="mb-1 font-semibold capitalize">
+              {key.replace(/_/g, " ")}
+            </label>
+            <input
+              type="text"
+              placeholder={key.replace(/_/g, " ")}
+              className="border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={filters[key as keyof Filters]}
+              onChange={(e) =>
+                handleFilterChange(key as keyof Filters, e.target.value)
+              }
+            />
+          </div>
+        ))}
+        <button
+          onClick={() => {
+            setPage(1);
+            fetchData();
+          }}
+          className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition-all self-end"
+        >
+          Filter
+        </button>
+      </div>
+
+      {/* Table */}
+      <table className="min-w-full bg-white border border-gray-200 text-sm">
+        <thead>
+          <tr>
+            <HeaderAndValue header={true} Title="Email" />
+            <HeaderAndValue header={true} Title="Make" />
+            <HeaderAndValue header={true} Title="Model" />
+            <HeaderAndValue header={true} Title="Actuation Type" />
+            <HeaderAndValue header={true} Title="Actuation Option" />
+            <HeaderAndValue header={true} Title="Input" />
+            <HeaderAndValue header={true} Title="Device" />
+            <HeaderAndValue header={true} Title="Product ID" />
+            <HeaderAndValue header={true} Title="User Car Model ID" />
+            <HeaderAndValue header={true} Title="end Date" />
+            <HeaderAndValue header={true} Title="Created At" />
+            <HeaderAndValue header={true} Title="Updated At" />
+            <HeaderAndValue header={true} Title="Show" />
+          </tr>
+        </thead>
+        <tbody>
+          {actuationsData.map((item, index) => (
+            <tr key={index}>
+              <HeaderAndValue Title={item.user_email || "-"} />
+              <HeaderAndValue Title={item.make} />
+              <HeaderAndValue Title={item.model} />
+              <HeaderAndValue Title={item.actuation_type} />
+              <HeaderAndValue Title={item.actuation_option} />
+              <HeaderAndValue Title={item.input || "-"} />
+              <HeaderAndValue Title={item.device || "-"} />
+              <HeaderAndValue Title={item.product_id || "-"} />
+              <HeaderAndValue Title={item.user_car_model_id || "-"} />
+              <HeaderAndValue Title={item.end_date || "-"} />
+              <HeaderAndValue
+                Title={new Date(item.created_at).toLocaleString()}
+              />
+              <HeaderAndValue
+                Title={new Date(item.updated_at).toLocaleString()}
+              />
+              <td className="border px-4 py-2">
+                <button
+                  onClick={() =>
+                    navigate("/ActuationsDetail/details", {
+                      state: {
+                        ScanArray: item.scanResArray,
+                        created_at: item.created_at,
+                        updated_at: item.updated_at,
+                        email: item.user_email,
+                        make: item.make,
+                        model: item.model,
+                      },
+                    })
+                  }
+                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                >
+                  View Details
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Pagination */}
+      <div className="mt-4 flex justify-center items-center space-x-2">
+        <button
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+        >
+          Previous
+        </button>
+
+        <span className="font-semibold">
+          Page {page} of {totalPages}
+        </span>
+
+        <button
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={page === totalPages}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default ActuationsDetail;
