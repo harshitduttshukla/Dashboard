@@ -1,18 +1,8 @@
-
-
-
 import React, { useEffect, useState } from "react";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ModelListPage: React.FC = () => {
-  const [makeList] = useState<string[]>([
-    "Hyundai",
-    "Maruti",
-    "Mahindra",
-    "Tata",
-    "Honda",
-  ]);
   const [selectedMake, setSelectedMake] = useState<string>("Mahindra");
   const [modelList, setModelList] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -27,11 +17,14 @@ const ModelListPage: React.FC = () => {
 
     try {
       const trimmedMake = selectedMake.trim();
-      const url = `${API_BASE_URL}api/fetch_model_list?make=${encodeURIComponent(trimmedMake)}`;
+      const url = `${API_BASE_URL}api/ModelList?make=${encodeURIComponent(
+        trimmedMake
+      )}`;
       console.log("Fetching models from:", url);
 
       const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      if (!response.ok)
+        throw new Error(`HTTP error! Status: ${response.status}`);
 
       const json = await response.json();
       console.log("API Response:", json);
@@ -40,7 +33,7 @@ const ModelListPage: React.FC = () => {
         const names = json.data.map((item: { name: string }) => item.name);
         setModelList(names);
       } else {
-        setError("No models found for the selected make.");
+        setError("No models found for the entered make.");
       }
     } catch (err) {
       console.error("Fetch error:", err);
@@ -61,18 +54,14 @@ const ModelListPage: React.FC = () => {
       </h1>
 
       <div className="mb-6 text-center">
-        <label className="mr-2 font-medium text-gray-700">Select Make:</label>
-        <select
+        <label className="mr-2 font-medium text-gray-700">Enter Make:</label>
+        <input
+          type="text"
           value={selectedMake}
           onChange={(e) => setSelectedMake(e.target.value)}
-          className="border px-4 py-2 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          {makeList.map((make) => (
-            <option key={make} value={make}>
-              {make}
-            </option>
-          ))}
-        </select>
+          className="border px-4 py-2 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+          placeholder="Type a make (e.g., Mahindra)"
+        />
 
         <button
           onClick={fetchModels}
@@ -82,7 +71,9 @@ const ModelListPage: React.FC = () => {
         </button>
       </div>
 
-      {loading && <p className="text-blue-500 text-center">Loading models...</p>}
+      {loading && (
+        <p className="text-blue-500 text-center">Loading models...</p>
+      )}
       {error && <p className="text-red-500 text-center">{error}</p>}
 
       {!loading && modelList.length > 0 && (
@@ -99,7 +90,9 @@ const ModelListPage: React.FC = () => {
       )}
 
       {!loading && !error && modelList.length === 0 && (
-        <p className="text-center text-gray-500">No models available for the selected make.</p>
+        <p className="text-center text-gray-500">
+          No models available for the entered make.
+        </p>
       )}
     </div>
   );

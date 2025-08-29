@@ -13,7 +13,7 @@ const BikeMakeList: React.FC = () => {
     setError("");
 
     try {
-      const url = `${BASE_URL}api/fetch_make_list?segement=${encodeURIComponent(segment)}`;
+      const url = `${BASE_URL}api/FetchMakeList?segement=${segment}`;
 
       const response = await fetch(url);
       if (!response.ok) {
