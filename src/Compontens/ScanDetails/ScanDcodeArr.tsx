@@ -96,10 +96,10 @@ const ScanDcodeArr: React.FC<ScanProps> = ({
               <tr>
                 <HeaderAndValue header={true} Title="System" />
                 <HeaderAndValue header={true} Title="PID" />
+                <HeaderAndValue header={true} Title="Data" />
                 <HeaderAndValue header={true} Title="Protocol" />
                 <HeaderAndValue header={true} Title="Header" />
                 <HeaderAndValue header={true} Title="Decoded Faults" />
-                <HeaderAndValue header={true} Title="Data" />
               </tr>
             </thead>
             <tbody>
@@ -107,6 +107,7 @@ const ScanDcodeArr: React.FC<ScanProps> = ({
                 <tr key={idx} className="hover:bg-gray-50">
                   <HeaderAndValue Title={decoded.system} />
                   <HeaderAndValue Title={decoded.pid} />
+                  <HeaderAndValue Title={decoded.data} />
                   <HeaderAndValue Title={decoded.protocol} />
                   <HeaderAndValue Title={decoded.header} />
                   <td className="border px-4 py-2">
@@ -118,7 +119,6 @@ const ScanDcodeArr: React.FC<ScanProps> = ({
                       ))}
                     </ul>
                   </td>
-                  <HeaderAndValue Title={decoded.data} />
                 </tr>
               ))}
             </tbody>
