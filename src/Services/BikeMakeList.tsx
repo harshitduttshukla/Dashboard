@@ -98,7 +98,7 @@ const BikeMakeList: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded shadow">
-      <h1 className="text-2xl font-bold text-center text-green-700 mb-4">
+      <h1 className="text-2xl font-bold text-center text-blue-700 mb-4">
         Bike Make List
       </h1>
 
@@ -114,7 +114,7 @@ const BikeMakeList: React.FC = () => {
 
       <button
         onClick={fetchBikeMakes}
-        className="w-full bg-green-500 text-white p-2 rounded mb-4"
+        className="w-full bg-blue-500 text-white p-2 rounded mb-4"
       >
         Fetch Bike Makes
       </button>

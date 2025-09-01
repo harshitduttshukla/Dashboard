@@ -6,9 +6,9 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { label: "UsersTable", path: "/UsersTable" },
+  { label: "Users Table", path: "/UsersTable" },
   { label: "Covarage Data", path: "/Api1" },
-  { label: "Machine commands", path: "/Api2" },
+  { label: "Mechanic Commands", path: "/Api2" },
   { label: "Cars Scans", path: "/ObdScanReport" },
   { label: "Special Function", path: "/SpecilaFunction" },
   { label: "Actuations Detail", path: "/ActuationsDetail" },
@@ -26,7 +26,7 @@ const menuItems: MenuItem[] = [
 function Sidebar() {
   return (
     <div className="bg-gray-100 h-screen w-64 p-4 shadow-lg overflow-y-auto">
-      <h2 className="text-2xl font-bold mb-6 ml-4 text-gray-800">Dashboard</h2>
+      <h2 className="text-2xl font-bold mb-6 ml-4 text-gray-800 ">DashBoard</h2>
 
       <div className="space-y-4">
         {menuItems.map((item) => (

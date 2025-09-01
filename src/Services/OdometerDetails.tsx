@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 30;
 
 const OdometerDetails: React.FC = () => {
   const [odometerData, setOdometerData] = useState<any[]>([]);
@@ -282,108 +282,100 @@ const OdometerDetails: React.FC = () => {
                 <tbody>
                   {odometerData.map((item, idx) => (
                     <tr key={idx} className="hover:bg-gray-50">
-                      <td className="border px-3 py-2">
+                      <td className="border px-3">
                         {item.header ? (
-                          <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-mono">
+                          <span className=" px-2  rounded text-xs font-mono">
                             {item.header}
                           </span>
                         ) : (
                           "-"
                         )}
                       </td>
-                      <td className="border px-3 py-2">
+                      <td className="border px-3">
                         {item.subHeader ? (
-                          <span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded text-xs font-mono">
+                          <span className=" px-2  rounded text-xs font-mono">
                             {item.subHeader}
                           </span>
                         ) : (
                           "-"
                         )}
                       </td>
-                      <td className="border px-3 py-2">
+                      <td className="border px-3 ">
                         {item.pid ? (
-                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-mono">
+                          <span className=" px-2  rounded text-xs font-mono">
                             {item.pid}
                           </span>
                         ) : (
                           "-"
                         )}
                       </td>
-                      <td className="border px-3 py-2">
+                      <td className="border px-3 ">
                         {item.protocol ? (
-                          <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                          <span className=" px-2  rounded text-xs">
                             {item.protocol}
                           </span>
                         ) : (
                           "-"
                         )}
                       </td>
-                      <td className="border px-3 py-2">
+                      <td className="border px-3 ">
                         {item.system ? (
-                          <span className="bg-teal-100 text-teal-800 px-2 py-1 rounded text-xs font-semibold">
+                          <span className=" px-2  rounded text-xs ">
                             {item.system}
                           </span>
                         ) : (
                           "-"
                         )}
                       </td>
-                      <td className="border px-3 py-2">
+                      <td className="border px-3">
                         {item.init ? (
-                          <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">
+                          <span className=" px-2  rounded text-xs">
                             {item.init}
                           </span>
                         ) : (
                           "-"
                         )}
                       </td>
-                      <td className="border px-3 py-2">
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          item.formulaBased 
-                            ? "bg-green-100 text-green-800" 
-                            : "bg-red-100 text-red-800"
-                        }`}>
+                      <td className="border px-3">
+                        <span className={`px-2  rounded text-xs `}>
                           {item.formulaBased ? "Yes" : "No"}
                         </span>
                       </td>
                       <td className="border px-3 py-2">
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          item.generic 
-                            ? "bg-green-100 text-green-800" 
-                            : "bg-red-100 text-red-800"
-                        }`}>
+                        <span className={`px-2  rounded text-xs`}>
                           {item.generic ? "Yes" : "No"}
                         </span>
                       </td>
-                      <td className="border px-3 py-2 max-w-xs">
+                      <td className="border px-3  max-w-xs">
                         {item.formula_metric ? (
-                          <span className="font-mono text-green-700 bg-green-50 px-2 py-1 rounded text-xs block break-all">
+                          <span className="   rounded text-xs block break-all">
                             {item.formula_metric}
                           </span>
                         ) : (
                           "-"
                         )}
                       </td>
-                      <td className="border px-3 py-2 max-w-xs">
+                      <td className="border px-3 max-w-xs">
                         {item.formula_imperial ? (
-                          <span className="font-mono text-orange-700 bg-orange-50 px-2 py-1 rounded text-xs block break-all">
+                          <span className=" px-2  rounded text-xs block break-all">
                             {item.formula_imperial}
                           </span>
                         ) : (
                           "-"
                         )}
                       </td>
-                      <td className="border px-3 py-2">
+                      <td className="border px-3 ">
                         {item.unit_metric ? (
-                          <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                          <span className=" px-2 py-1 rounded ">
                             {item.unit_metric}
                           </span>
                         ) : (
                           "-"
                         )}
                       </td>
-                      <td className="border px-3 py-2">
+                      <td className="border px-3 ">
                         {item.unit_imperial ? (
-                          <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                          <span className=" px-2 py-1 rounded ">
                             {item.unit_imperial}
                           </span>
                         ) : (

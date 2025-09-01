@@ -302,15 +302,7 @@ const FaultCodesUploader = () => {
               </div>
 
               {/* Debug Info */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <h3 className="font-medium text-yellow-900 mb-2">⚠️ Troubleshooting:</h3>
-                <div className="text-sm text-yellow-800 space-y-1">
-                  <p>1. Ensure your Express server is running</p>
-                  <p>2. Check that the route is mounted correctly (e.g., app.use('/api', router))</p>
-                  <p>3. Verify CORS is configured if frontend/backend are on different ports</p>
-                  <p>4. Check browser console for more details</p>
-                </div>
-              </div>
+          
 
               {/* Error Display */}
               {error && (

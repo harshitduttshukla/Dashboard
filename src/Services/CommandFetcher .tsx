@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import * as XLSX from 'xlsx';
+
 
 type Detail = {
   pid: string;
@@ -70,67 +70,67 @@ const SPFCommands: React.FC = () => {
   const currentPageItems = data.length;
 
   // Excel download function
-  const downloadExcel = async () => {
-    try {
-      setLoading(true);
+  // const downloadExcel = async () => {
+  //   try {
+  //     setLoading(true);
       
-      // Fetch all data without pagination
-      const params = new URLSearchParams();
-      if (make) params.append("make", make);
-      if (model) params.append("model", model);
-      if (year) params.append("year", year);
+  //     // Fetch all data without pagination
+  //     const params = new URLSearchParams();
+  //     if (make) params.append("make", make);
+  //     if (model) params.append("model", model);
+  //     if (year) params.append("year", year);
       
-      // Don't add page and limit to get all data
-      const url = `${BASE_URL}api/SPFCommands?${params.toString()}`;
-      const response = await fetch(url);
-      const json = await response.json();
+  //     // Don't add page and limit to get all data
+  //     const url = `${BASE_URL}api/SPFCommands?${params.toString()}`;
+  //     const response = await fetch(url);
+  //     const json = await response.json();
       
-      if (json.data && json.data.length > 0) {
-        // Prepare data for Excel
-        const excelData : any = [];
+  //     if (json.data && json.data.length > 0) {
+  //       // Prepare data for Excel
+  //       const excelData : any = [];
         
-        json.data.forEach((command : any) => {
-          if (command.details && command.details.length > 0) {
-            command.details.forEach((detail : any) => {
-              excelData.push({
-                'Function Name': command.function_name,
-                'Hard Coded': command.hard_coded ? 'True' : 'False',
-                'PID': detail.pid || 'N/A',
-                'Message': detail.message || 'N/A',
-                'Command Type': detail.command_type || 'N/A'
-              });
-            });
-          } else {
-            excelData.push({
-              'Function Name': command.function_name,
-              'Hard Coded': command.hard_coded ? 'True' : 'False',
-              'PID': 'N/A',
-              'Message': 'N/A',
-              'Command Type': 'N/A'
-            });
-          }
-        });
+  //       json.data.forEach((command : any) => {
+  //         if (command.details && command.details.length > 0) {
+  //           command.details.forEach((detail : any) => {
+  //             excelData.push({
+  //               'Function Name': command.function_name,
+  //               'Hard Coded': command.hard_coded ? 'True' : 'False',
+  //               'PID': detail.pid || 'N/A',
+  //               'Message': detail.message || 'N/A',
+  //               'Command Type': detail.command_type || 'N/A'
+  //             });
+  //           });
+  //         } else {
+  //           excelData.push({
+  //             'Function Name': command.function_name,
+  //             'Hard Coded': command.hard_coded ? 'True' : 'False',
+  //             'PID': 'N/A',
+  //             'Message': 'N/A',
+  //             'Command Type': 'N/A'
+  //           });
+  //         }
+  //       });
         
-        // Create workbook and worksheet
-        const ws = XLSX.utils.json_to_sheet(excelData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'SPF Commands');
+  //       // Create workbook and worksheet
+  //       const ws = XLSX.utils.json_to_sheet(excelData);
+  //       const wb = XLSX.utils.book_new();
+  //       XLSX.utils.book_append_sheet(wb, ws, 'SPF Commands');
         
-        // Generate filename
-        const filename = `SPF_Commands_${make || 'All'}_${model || 'All'}_${year || 'All'}_${new Date().toISOString().split('T')[0]}.xlsx`;
+  //       // Generate filename
+  //       const filename = `SPF_Commands_${make || 'All'}_${model || 'All'}_${year || 'All'}_${new Date().toISOString().split('T')[0]}.xlsx`;
         
-        // Download file
-        XLSX.writeFile(wb, filename);
-      } else {
-        alert('No data available to download');
-      }
-    } catch (err) {
-      console.error('Error downloading Excel:', err);
-      alert('Failed to download Excel file');
-    } finally {
-      setLoading(false);
-    }
-  };
+  //       // Download file
+  //       XLSX.writeFile(wb, filename);
+  //     } else {
+  //       alert('No data available to download');
+  //     }
+  //   } catch (err) {
+  //     console.error('Error downloading Excel:', err);
+  //     alert('Failed to download Excel file');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // Generate page numbers to show
   const getPageNumbers = () => {
@@ -152,7 +152,7 @@ const SPFCommands: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col p-6 max-w-6xl mx-auto">
       {/* Header */}
-      <h1 className="text-2xl font-semibold mb-4 text-center text-green-700">
+      <h1 className="text-2xl font-semibold mb-4 text-center text-blue-700">
         SPF Commands Viewer
       </h1>
 
@@ -165,35 +165,35 @@ const SPFCommands: React.FC = () => {
             value={make}
             onChange={(e) => setMake(e.target.value)}
             placeholder="e.g. Hyundai"
-            className="border px-4 py-2 rounded shadow-sm focus:ring-2 focus:ring-green-500"
+            className="border px-4 py-2 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="text"
             value={model}
             onChange={(e) => setModel(e.target.value)}
             placeholder="e.g. i20"
-            className="border px-4 py-2 rounded shadow-sm focus:ring-2 focus:ring-green-500"
+            className="border px-4 py-2 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="text"
             value={year}
             onChange={(e) => setYear(e.target.value)}
             placeholder="e.g. 2020"
-            className="border px-4 py-2 rounded shadow-sm focus:ring-2 focus:ring-green-500"
+            className="border px-4 py-2 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
           />
           <button
             onClick={() => {
               setPage(1); // Reset page on new search
               fetchData();
             }}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded transition"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition"
           >
             Fetch SPF
           </button>
         </div>
         
         {/* Excel Download Button */}
-        <div className="flex justify-end">
+        {/* <div className="flex justify-end">
           <button
             onClick={downloadExcel}
             disabled={loading || data.length === 0}
@@ -204,11 +204,11 @@ const SPFCommands: React.FC = () => {
             </svg>
             Download Excel
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Status Messages */}
-      {loading && <p className="text-green-500 text-center">Loading...</p>}
+      {loading && <p className="text-blue-500 text-center">Loading...</p>}
       {error && <p className="text-red-500 text-center">{error}</p>}
 
       {/* Data Table (scrollable) */}

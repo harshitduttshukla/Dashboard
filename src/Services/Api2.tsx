@@ -1,8 +1,8 @@
 
 
 
-import { useState, useEffect, useCallback } from 'react';
-import { Search, Download, ChevronLeft, ChevronRight, Car, Settings, FileSpreadsheet, RefreshCw, AlertCircle } from 'lucide-react';
+import { useState, useEffect, } from 'react';
+import { Search, ChevronLeft, ChevronRight, Car, Settings, FileSpreadsheet, RefreshCw, AlertCircle } from 'lucide-react';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -192,27 +192,7 @@ const CommandAPIFrontend = () => {
     });
   };
 
-  const downloadExcel = () => {
-    // Create Excel content
-    const headers = ['Command', 'Module'];
-    const csvContent = [
-      headers.join(','),
-      ...filteredCommands.map(cmd => 
-        `"${cmd.command}","${cmd.module}"`
-      )
-    ].join('\n');
-    
-    // Create and download file
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `diagnostic_commands_${make}_${Date.now()}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-  };
+  
 
   // Auto-fetch on component mount
   useEffect(() => {
@@ -339,14 +319,7 @@ const CommandAPIFrontend = () => {
                 )}
               </button>
 
-              <button
-                onClick={downloadExcel}
-                disabled={filteredCommands.length === 0}
-                className="inline-flex items-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download CSV
-              </button>
+           
             </div>
           </div>
 
@@ -382,38 +355,7 @@ const CommandAPIFrontend = () => {
                 </div>
               </div>
 
-              {/* Pagination Controls */}
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-700">
-                  Showing {((pagination.currentPage - 1) * pagination.itemsPerPage) + 1} to{' '}
-                  {Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)} of{' '}
-                  {pagination.totalItems} commands
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => handlePageChange(pagination.currentPage - 1)}
-                    disabled={pagination.currentPage === 1}
-                    className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    Previous
-                  </button>
-                  
-                  <span className="text-sm text-gray-700">
-                    Page {pagination.currentPage} of {pagination.totalPages}
-                  </span>
-                  
-                  <button
-                    onClick={() => handlePageChange(pagination.currentPage + 1)}
-                    disabled={pagination.currentPage === pagination.totalPages}
-                    className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Next
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+              
 
               {/* Commands Table */}
               <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
@@ -432,20 +374,20 @@ const CommandAPIFrontend = () => {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y divide-gray-100">
                       {getPaginatedData().map((command, index) => (
                         <tr key={index} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <code className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
+                          <td className="px-6 whitespace-nowrap">
+                            <code className="text-sm font-mono  px-2 py-1 rounded">
                               {command.command}
                             </code>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          <td className="px-6  whitespace-nowrap text-sm text-gray-900">
+                            <span className="inline-flex items-center rounded-full text-xs font-medium ">
                               {command.module}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6  whitespace-nowrap text-sm ">
                             {command.command.startsWith('AT') ? 'Setup' : 'Diagnostic'}
                           </td>
                         </tr>
@@ -557,21 +499,7 @@ const CommandAPIFrontend = () => {
             </div>
           )}
 
-          {/* API Info */}
-          {/* <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <h3 className="font-medium text-gray-900 mb-2">API Endpoint Information</h3>
-            <div className="text-sm text-gray-600 space-y-1">
-              <p><strong>Endpoint:</strong> /api/CommandAPI</p>
-              <p><strong>Method:</strong> GET</p>
-              <p><strong>Parameters:</strong></p>
-              <ul className="ml-4 space-y-1">
-                <li>• make: {make}</li>
-                <li>• module: {JSON.stringify(selectedModules)}</li>
-                <li>• function_type: {functionType}</li>
-                <li>• full_scan: {fullScan.toString()}</li>
-              </ul>
-            </div>
-          </div> */}
+        
         </div>
       </div>
     </div>

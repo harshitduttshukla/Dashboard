@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import * as XLSX from 'xlsx';
+
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -65,84 +65,7 @@ const CustomCommands: React.FC = () => {
     }
   };
 
-  // Excel download function
-  const downloadExcel = async () => {
-    try {
-      setLoading(true);
-      
-      // Fetch all data without pagination
-      const params = new URLSearchParams();
-      if (make) params.append("make", make);
-      if (model) params.append("model", model);
-      if (year) params.append("year", year);
-      
-      // Don't add page and limit to get all data
-      const url = params.toString()
-        ? `${API_BASE_URL}api/CustomCommands?${params.toString()}`
-        : `${API_BASE_URL}api/CustomCommands`;
-
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      
-      const json = await response.json();
-      
-      if (json.data && Array.isArray(json.data) && json.data.length > 0) {
-        // Prepare data for Excel - flatten the commands structure
-        const excelData : any = [];
-        
-        json.data.forEach((item: any) => {
-          const normalizedItem = {
-            function_name: item.function_name,
-            variant: item.variant || [],
-            commands: item.commands?.[0] || {},
-          };
-          
-          if (Object.keys(normalizedItem.commands).length > 0) {
-            // Create rows for each variant and its commands
-            Object.entries(normalizedItem.commands).forEach(([variant, cmds]) => {
-              if (Array.isArray(cmds)) {
-                cmds.forEach((cmd: string) => {
-                  excelData.push({
-                    'Function Name': normalizedItem.function_name,
-                    'Variants': normalizedItem.variant.join(', '),
-                    'Command Variant': variant,
-                    'Command': cmd
-                  });
-                });
-              }
-            });
-          } else {
-            // If no commands, at least add the function info
-            excelData.push({
-              'Function Name': normalizedItem.function_name,
-              'Variants': normalizedItem.variant.join(', '),
-              'Command Variant': 'N/A',
-              'Command': 'N/A'
-            });
-          }
-        });
-        
-        // Create workbook and worksheet
-        const ws = XLSX.utils.json_to_sheet(excelData );
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Custom Commands');
-        
-        // Generate filename
-        const filename = `Custom_Commands_${make || 'All'}_${model || 'All'}_${year || 'All'}_${new Date().toISOString().split('T')[0]}.xlsx`;
-        
-        // Download file
-        XLSX.writeFile(wb, filename);
-      } else {
-        alert('No data available to download');
-      }
-    } catch (err) {
-      console.error('Error downloading Excel:', err);
-      alert('Failed to download Excel file');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+ 
   useEffect(() => {
     fetchCustomCommands(1);
   }, []);
@@ -211,19 +134,7 @@ const CustomCommands: React.FC = () => {
           </button>
         </div>
         
-        {/* Excel Download Button */}
-        <div className="flex justify-end">
-          <button
-            onClick={downloadExcel}
-            disabled={loading || data.length === 0}
-            className="bg-blue-300 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2 rounded transition flex items-center gap-2"
-          >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M3 17a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2zM3.293 7.707A1 1 0 014 7h3V3a1 1 0 011-1h4a1 1 0 011 1v4h3a1 1 0 01.707 1.707l-7 7a1 1 0 01-1.414 0l-7-7z"/>
-            </svg>
-            Download Excel
-          </button>
-        </div>
+      
       </div>
 
       {/* Table */}

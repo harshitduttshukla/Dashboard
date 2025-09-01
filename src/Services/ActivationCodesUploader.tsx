@@ -301,15 +301,7 @@ const ActivationCodesUploader = () => {
               </div>
 
               {/* Debug Info */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <h3 className="font-medium text-yellow-900 mb-2">⚠️ Troubleshooting:</h3>
-                <div className="text-sm text-yellow-800 space-y-1">
-                  <p>1. Ensure your Express server is running</p>
-                  <p>2. Check that the upload route is mounted correctly</p>
-                  <p>3. Verify CORS is configured if frontend/backend are on different ports</p>
-                  <p>4. Make sure all required fields are present in your file</p>
-                </div>
-              </div>
+            
 
               {/* Error Display */}
               {error && (
