@@ -7,19 +7,20 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { label: "UsersTable", path: "/UsersTable" },
-  { label: "Service 1 for Car", path: "/Api1" },
-  { label: "Service for Scan Car", path: "/Api2" },
-  { label: "Obd Scan Report", path: "/ObdScanReport" },
+  { label: "Covarage Data", path: "/Api1" },
+  { label: "Machine commands", path: "/Api2" },
+  { label: "Cars Scans", path: "/ObdScanReport" },
   { label: "Special Function", path: "/SpecilaFunction" },
   { label: "Actuations Detail", path: "/ActuationsDetail" },
   { label: "Custom commands", path: "/Customcommands1" },
-  { label: "Actuation Fetcher", path: "/ActuationFetcher" },
+  { label: "Actuation Test", path: "/ActuationFetcher" },
   { label: "SPF Commands", path: "/CommandFetcher" },
   { label: "Model List Page", path: "/ModelListPage" },
   { label: "Bike Make List", path: "/BikeMakeList" },
   { label: "Odometer Details", path: "/OdometerDetails" },
   { label: "Update commands", path: "/Updatecommand" },
   { label: "Fault Codes Uploader", path: "/FaultCodesUploader" },
+  { label: "Activation Codes Uploader", path: "/ActivationCodesUploader" },
 ];
 
 function Sidebar() {

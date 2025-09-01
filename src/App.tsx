@@ -17,6 +17,7 @@ import ActuationsDetailpage from "./Compontens/ActuationsDetails/ActuationsDetai
 import SpecilaFunction from "./Services/SpecialFunctions.tsx";
 import ActuationsDetail from "./Services/ActuationsDetail.tsx";
 import FaultCodesUploader from "./Services/FaultCodesUploader.tsx";
+import ActivationCodesUploader from "./Services/ActivationCodesUploader.tsx";
 
 
 
@@ -42,6 +43,7 @@ function App() {
           <Route path="OdometerDetails" element={<OdometerDetails />} />
           <Route path="Updatecommand" element={<FileUploader />} />
           <Route path="FaultCodesUploader" element={<FaultCodesUploader />} />
+          <Route path="ActivationCodesUploader" element={<ActivationCodesUploader />} />
         </Route>
       </Routes>
     </BrowserRouter>

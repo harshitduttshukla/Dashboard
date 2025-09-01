@@ -1,34 +1,35 @@
 import { useState, useCallback } from 'react';
-import { Upload, FileSpreadsheet, CheckCircle, XCircle, AlertCircle, Database, Trash2, Eye, type LucideIcon } from 'lucide-react';
+import { Upload, FileSpreadsheet, CheckCircle, XCircle, AlertCircle, Database, Trash2, Key } from 'lucide-react';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 // Type definitions
-interface UploadStats {
-  inserted?: number;
-  duplicates?: number;
-  skipped?: number;
+interface DuplicateDetails {
+  inFile: number;
+  inDatabase: number;
+  fileDuplicateDetails: Array<{
+    code: string;
+    rows: number[];
+  }>;
+  dbDuplicateCodes: string[];
 }
 
 interface UploadResult {
-  success: boolean;
+  success?: boolean;
   message: string;
-  stats?: {
-    my_fault_codes?: UploadStats;
-    fault_code_causes?: UploadStats;
-    my_fault_code_symptoms?: UploadStats;
-    my_fault_code_solutions?: UploadStats;
-  };
+  totalRows: number;
+  importedRows: number;
+  duplicates: DuplicateDetails;
 }
 
 interface StatCardProps {
   title: string;
-  data?: UploadStats;
-  icon: LucideIcon;
+  value: number;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
 }
 
-const FaultCodesUploader = () => {
+const ActivationCodesUploader = () => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
@@ -61,11 +62,15 @@ const FaultCodesUploader = () => {
   const handleFileSelect = (selectedFile: File) => {
     const allowedTypes = [
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-excel'
+      'application/vnd.ms-excel',
+      'text/csv'
     ];
     
-    if (!allowedTypes.includes(selectedFile.type)) {
-      setError('Please select an Excel file (.xlsx or .xls)');
+    const allowedExtensions = ['.xlsx', '.xls', '.csv'];
+    const fileExtension = selectedFile.name.toLowerCase().substring(selectedFile.name.lastIndexOf('.'));
+    
+    if (!allowedTypes.includes(selectedFile.type) && !allowedExtensions.includes(fileExtension)) {
+      setError('Please select a valid file (.xlsx, .xls, or .csv)');
       return;
     }
     
@@ -101,7 +106,8 @@ const FaultCodesUploader = () => {
     try {
       // Try multiple possible API endpoints
       const possibleEndpoints = [
-        `${BASE_URL}api/FaultUplodes`, // if running on different port  
+        `${BASE_URL}api/uplodeactivationcode`
+       
       ];
 
       let response: Response | undefined;
@@ -136,8 +142,11 @@ const FaultCodesUploader = () => {
 
       const result: UploadResult = await response.json();
 
-      if (response.ok && result.success) {
-        setUploadResult(result);
+      if (response.ok) {
+        setUploadResult({
+          ...result,
+          success: true
+        });
         setFile(null);
         // Reset file input
         const fileInput = document.getElementById('file-input') as HTMLInputElement;
@@ -185,26 +194,13 @@ const FaultCodesUploader = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const StatCard: React.FC<StatCardProps> = ({ title, data, icon: Icon, color }) => (
+  const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, color }) => (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-sm font-medium text-gray-700">{title}</h4>
         <Icon className={`w-5 h-5 ${color}`} />
       </div>
-      <div className="space-y-2">
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Inserted:</span>
-          <span className="font-medium text-green-600">{data?.inserted || 0}</span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Duplicates:</span>
-          <span className="font-medium text-yellow-600">{data?.duplicates || 0}</span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Skipped:</span>
-          <span className="font-medium text-red-600">{data?.skipped || 0}</span>
-        </div>
-      </div>
+      <div className="text-2xl font-bold text-gray-900">{value}</div>
     </div>
   );
 
@@ -212,12 +208,12 @@ const FaultCodesUploader = () => {
     <div className="max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen">
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-8">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-700 px-6 py-8">
           <div className="flex items-center space-x-3">
-            <Database className="w-8 h-8 text-white" />
+            <Key className="w-8 h-8 text-white" />
             <div>
-              <h1 className="text-2xl font-bold text-white">Fault Codes Uploader</h1>
-              <p className="text-blue-100 mt-1">Import Excel files with fault descriptions, causes, symptoms, and solutions</p>
+              <h1 className="text-2xl font-bold text-white">Activation Codes Uploader</h1>
+              <p className="text-indigo-100 mt-1">Import CSV or Excel files with activation codes, plans, duration, and vehicle information</p>
             </div>
           </div>
         </div>
@@ -230,7 +226,7 @@ const FaultCodesUploader = () => {
               <div
                 className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ${
                   dragActive
-                    ? 'border-blue-400 bg-blue-50'
+                    ? 'border-indigo-400 bg-indigo-50'
                     : file
                     ? 'border-green-300 bg-green-50'
                     : 'border-gray-300 bg-gray-50 hover:border-gray-400 hover:bg-gray-100'
@@ -242,7 +238,7 @@ const FaultCodesUploader = () => {
                 <input
                   id="file-input"
                   type="file"
-                  accept=".xlsx,.xls"
+                  accept=".xlsx,.xls,.csv"
                   onChange={handleFileInputChange}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   disabled={uploading}
@@ -268,37 +264,40 @@ const FaultCodesUploader = () => {
                     <Upload className="w-16 h-16 text-gray-400 mx-auto" />
                     <div>
                       <p className="text-lg font-medium text-gray-700">
-                        Drop your Excel file here or click to browse
+                        Drop your file here or click to browse
                       </p>
                       <p className="text-sm text-gray-500 mt-2">
-                        Supports .xlsx and .xls files up to 10MB
+                        Supports .xlsx, .xls, and .csv files up to 10MB
                       </p>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Expected Sheets Info */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-medium text-blue-900 mb-2">Expected Excel Sheets:</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+              {/* Expected Fields Info */}
+              <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                <h3 className="font-medium text-indigo-900 mb-2">Expected File Format:</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-blue-700">fault_descriptions</span>
+                    <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                    <span className="text-indigo-700">ActivationCode</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-blue-700">causes</span>
+                    <span className="text-indigo-700">Plan</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <span className="text-blue-700">symptoms</span>
+                    <span className="text-indigo-700">Duration</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <span className="text-blue-700">solutions</span>
+                    <span className="text-indigo-700">Vehicle</span>
                   </div>
                 </div>
+                <p className="text-xs text-indigo-600 mt-2">
+                  For CSV: Use headers like "ActivationCode", "Activation Code", or "activation_code" (similar flexibility for other fields)
+                </p>
               </div>
 
               {/* Debug Info */}
@@ -306,9 +305,9 @@ const FaultCodesUploader = () => {
                 <h3 className="font-medium text-yellow-900 mb-2">⚠️ Troubleshooting:</h3>
                 <div className="text-sm text-yellow-800 space-y-1">
                   <p>1. Ensure your Express server is running</p>
-                  <p>2. Check that the route is mounted correctly (e.g., app.use('/api', router))</p>
+                  <p>2. Check that the upload route is mounted correctly</p>
                   <p>3. Verify CORS is configured if frontend/backend are on different ports</p>
-                  <p>4. Check browser console for more details</p>
+                  <p>4. Make sure all required fields are present in your file</p>
                 </div>
               </div>
 
@@ -328,7 +327,7 @@ const FaultCodesUploader = () => {
                 <button
                   onClick={uploadFile}
                   disabled={!file || uploading}
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {uploading ? (
                     <>
@@ -360,37 +359,69 @@ const FaultCodesUploader = () => {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Import Statistics</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <StatCard
-                    title="Fault Codes"
-                    data={uploadResult.stats?.my_fault_codes}
+                    title="Total Rows"
+                    value={uploadResult.totalRows}
                     icon={Database}
                     color="text-blue-500"
                   />
                   <StatCard
-                    title="Causes"
-                    data={uploadResult.stats?.fault_code_causes}
-                    icon={AlertCircle}
+                    title="Imported"
+                    value={uploadResult.importedRows}
+                    icon={CheckCircle}
                     color="text-green-500"
                   />
                   <StatCard
-                    title="Symptoms"
-                    data={uploadResult.stats?.my_fault_code_symptoms}
-                    icon={Eye}
+                    title="File Duplicates"
+                    value={uploadResult.duplicates?.inFile || 0}
+                    icon={AlertCircle}
                     color="text-yellow-500"
                   />
                   <StatCard
-                    title="Solutions"
-                    data={uploadResult.stats?.my_fault_code_solutions}
-                    icon={CheckCircle}
-                    color="text-purple-500"
+                    title="DB Duplicates"
+                    value={uploadResult.duplicates?.inDatabase || 0}
+                    icon={XCircle}
+                    color="text-red-500"
                   />
                 </div>
               </div>
+
+              {/* Duplicate Details */}
+              {(uploadResult.duplicates?.fileDuplicateDetails?.length > 0 || uploadResult.duplicates?.dbDuplicateCodes?.length > 0) && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <h4 className="font-medium text-yellow-900 mb-3">Duplicate Information</h4>
+                  
+                  {uploadResult.duplicates.fileDuplicateDetails?.length > 0 && (
+                    <div className="mb-4">
+                      <h5 className="font-medium text-yellow-800 mb-2">File Duplicates:</h5>
+                      <div className="text-sm text-yellow-700 space-y-1">
+                        {uploadResult.duplicates.fileDuplicateDetails.map((dup, index) => (
+                          <p key={index}>
+                            Code: <span className="font-mono">{dup.code}</span> appears on rows: {dup.rows.join(', ')}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {uploadResult.duplicates.dbDuplicateCodes?.length > 0 && (
+                    <div>
+                      <h5 className="font-medium text-yellow-800 mb-2">Database Duplicates:</h5>
+                      <div className="text-sm text-yellow-700">
+                        <p className="mb-1">The following codes already exist in the database:</p>
+                        <div className="font-mono text-xs bg-yellow-100 p-2 rounded max-h-32 overflow-y-auto">
+                          {uploadResult.duplicates.dbDuplicateCodes.join(', ')}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Actions */}
               <div className="flex justify-center space-x-4">
                 <button
                   onClick={resetUpload}
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
                 >
                   <Upload className="w-5 h-5 mr-2" />
                   Upload Another File
@@ -404,4 +435,4 @@ const FaultCodesUploader = () => {
   );
 };
 
-export default FaultCodesUploader;
+export default ActivationCodesUploader;

@@ -1,134 +1,581 @@
-import React, { useState } from 'react';
 
-type CommandItem = {
+
+
+import { useState, useEffect, useCallback } from 'react';
+import { Search, Download, ChevronLeft, ChevronRight, Car, Settings, FileSpreadsheet, RefreshCw, AlertCircle } from 'lucide-react';
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
+// Type definitions
+interface CommandData {
   command: string;
   module: string;
-};
+}
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL 
+interface ApiResponse {
+  data: CommandData[];
+}
 
-const Api2: React.FC = () => {
-  const [make, setMake] = useState('');
-  const [modules, setModules] = useState<string[]>(['Engine']);
-  const [functionType, setFunctionType] = useState('scan');
-  const [fullScan, setFullScan] = useState(true);
-  const [commandData, setCommandData] = useState<CommandItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+}
 
-  const handleScan = () => {
-    if (!make.trim()) {
-      setError('Please enter a car make.');
-      return;
-    }
+const CommandAPIFrontend = () => {
+  const [commands, setCommands] = useState<CommandData[]>([]);
+  const [filteredCommands, setFilteredCommands] = useState<CommandData[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Search and filter states
+  const [make, setMake] = useState<string>('Honda');
+  const [selectedModules, setSelectedModules] = useState<string[]>(['Engine', 'ABS']);
+  const [functionType, setFunctionType] = useState<string>('scan');
+  const [fullScan, setFullScan] = useState<boolean>(true);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  
+  // Pagination state
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 20
+  });
 
+  // Available modules (extracted from your data)
+  const availableModules = [
+    'Engine',
+    'EPS',
+    'Acoustic Vehicle Alerting System',
+    'Gauge system',
+    'ABS/EBCM',
+    'Immobilizer',
+    'Airbag',
+    'Vehicle Stability Assist(VSA)',
+    'Head Up Display',
+    'i-Shift (AMT)',
+    'Electric Servo Brake System',
+    'CAN Gateway',
+    'Intake Sound Creator',
+    'HVAC',
+    'Others'
+  ];
+
+  const fetchCommands = async () => {
     setLoading(true);
-    setError('');
-
-    const moduleStr = encodeURIComponent(JSON.stringify(modules));
-    const url = `${BASE_URL}api/fetch_command1?make=${encodeURIComponent(make)}&module=${moduleStr}&function_type=${functionType}&full_scan=${fullScan}`;
-
-    console.log('Request URL:', url);
-
-    fetch(url)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((result) => {
-        setCommandData(result.data || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError('Failed to fetch command data.');
-        setLoading(false);
+    setError(null);
+    
+    try {
+      // Build query parameters
+      const params = new URLSearchParams({
+        make,
+        function_type: functionType,
+        full_scan: fullScan.toString()
       });
+      
+      // Add modules as JSON array
+      params.append('module', JSON.stringify(selectedModules));
+      
+      const possibleEndpoints = [
+        `${BASE_URL}/api/CommandAPI?${params}`,
+        `${BASE_URL}api/CommandAPI?${params}`,
+        `/api/CommandAPI?${params}`
+      ];
+
+      let response: Response | undefined;
+
+      for (const endpoint of possibleEndpoints) {
+        try {
+          console.log(`Trying endpoint: ${endpoint}`);
+          response = await fetch(endpoint);
+          
+          if (response.status !== 404) {
+            break;
+          }
+        } catch (e) {
+          continue;
+        }
+      }
+
+      if (!response || response.status === 404) {
+        throw new Error('API endpoint not found. Please check your server configuration.');
+      }
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const result: ApiResponse = await response.json();
+      
+      if (result.data && Array.isArray(result.data)) {
+        setCommands(result.data);
+        setFilteredCommands(result.data);
+        
+        // Update pagination
+        const totalItems = result.data.length;
+        const totalPages = Math.ceil(totalItems / pagination.itemsPerPage);
+        setPagination(prev => ({
+          ...prev,
+          totalItems,
+          totalPages,
+          currentPage: 1
+        }));
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (err: unknown) {
+      console.error('Fetch error:', err);
+      let errorMessage = 'An unknown error occurred';
+      
+      if (err instanceof Error) {
+        errorMessage = err.message;
+        
+        if (err.message.includes('Failed to fetch')) {
+          errorMessage = 'Cannot connect to server. Please check if the server is running.';
+        }
+      }
+      
+      setError(errorMessage);
+      setCommands([]);
+      setFilteredCommands([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // Filter commands based on search term
+  useEffect(() => {
+    let filtered = commands;
+    
+    if (searchTerm.trim()) {
+      filtered = commands.filter(cmd => 
+        cmd.command.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        cmd.module.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    setFilteredCommands(filtered);
+    
+    // Update pagination for filtered results
+    const totalItems = filtered.length;
+    const totalPages = Math.ceil(totalItems / pagination.itemsPerPage);
+    setPagination(prev => ({
+      ...prev,
+      totalItems,
+      totalPages,
+      currentPage: 1
+    }));
+  }, [commands, searchTerm, pagination.itemsPerPage]);
+
+  // Get paginated data
+  const getPaginatedData = () => {
+    const startIndex = (pagination.currentPage - 1) * pagination.itemsPerPage;
+    const endIndex = startIndex + pagination.itemsPerPage;
+    return filteredCommands.slice(startIndex, endIndex);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      setPagination(prev => ({ ...prev, currentPage: newPage }));
+    }
+  };
+
+  const handleModuleToggle = (module: string) => {
+    setSelectedModules(prev => {
+      if (prev.includes(module)) {
+        return prev.filter(m => m !== module);
+      } else {
+        return [...prev, module];
+      }
+    });
+  };
+
+  const downloadExcel = () => {
+    // Create Excel content
+    const headers = ['Command', 'Module'];
+    const csvContent = [
+      headers.join(','),
+      ...filteredCommands.map(cmd => 
+        `"${cmd.command}","${cmd.module}"`
+      )
+    ].join('\n');
+    
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `diagnostic_commands_${make}_${Date.now()}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
+
+  // Auto-fetch on component mount
+  useEffect(() => {
+    fetchCommands();
+  }, []);
+
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-white rounded-lg shadow-md mt-6">
-      <h2 className="text-3xl font-semibold text-center mb-6 text-gray-800">
-        Fetch Command Data
-      </h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <input
-          type="text"
-          value={make}
-          onChange={(e) => setMake(e.target.value)}
-          placeholder="Enter car make (e.g. Honda)"
-          className="border border-gray-300 px-4 py-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        <select
-          value={functionType}
-          onChange={(e) => setFunctionType(e.target.value)}
-          className="border border-gray-300 px-4 py-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="scan">Scan</option>
-          <option value="read">Read</option>
-        </select>
-
-        <select
-          multiple
-          value={modules}
-          onChange={(e) =>
-            setModules(Array.from(e.target.selectedOptions, (opt) => opt.value))
-          }
-          className="border border-gray-300 px-4 py-2 rounded h-28 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="Engine">Engine</option>
-          <option value="ABS">ABS</option>
-          <option value="Airbag">Airbag</option>
-        </select>
-
-        <label className="flex items-center gap-2 px-2">
-          <input
-            type="checkbox"
-            checked={fullScan}
-            onChange={(e) => setFullScan(e.target.checked)}
-            className="accent-blue-600"
-          />
-          <span className="text-gray-700">Full Scan</span>
-        </label>
-      </div>
-
-      <button
-        onClick={handleScan}
-        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
-      >
-        Fetch Commands
-      </button>
-
-      {loading && <p className="mt-4 text-blue-500 font-medium">Loading...</p>}
-      {error && <p className="mt-4 text-red-600 font-medium">{error}</p>}
-
-      {Array.isArray(commandData) && commandData.length > 0 && (
-        <div className="mt-6 overflow-x-auto">
-          <h3 className="text-lg font-semibold mb-2 text-gray-800">Command Data</h3>
-          <table className="min-w-full border border-gray-300 shadow-sm rounded-md">
-            <thead>
-              <tr className="bg-gray-100 text-gray-700">
-                <th className="border px-4 py-3 text-left">Command</th>
-                <th className="border px-4 py-3 text-left">Module</th>
-              </tr>
-            </thead>
-            <tbody>
-              {commandData.map((cmd, idx) => (
-                <tr key={idx} className="hover:bg-gray-50">
-                  <td className="border px-4 py-2">{cmd.command}</td>
-                  <td className="border px-4 py-2">{cmd.module}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-8">
+          <div className="flex items-center space-x-3">
+            <Settings className="w-8 h-8 text-white" />
+            <div>
+              <h1 className="text-2xl font-bold text-white">Automotive Diagnostic Commands</h1>
+              <p className="text-blue-100 mt-1">Search and manage OBD-II diagnostic commands by vehicle make and module</p>
+            </div>
+          </div>
         </div>
-      )}
+
+        <div className="p-6">
+          {/* Search and Filter Section */}
+          <div className="bg-gray-50 rounded-lg p-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              {/* Vehicle Make */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Vehicle Make</label>
+                <select
+                  value={make}
+                  onChange={(e) => setMake(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="Honda">Honda</option>
+                  <option value="Toyota">Toyota</option>
+                  <option value="Ford">Ford</option>
+                  <option value="BMW">BMW</option>
+                </select>
+              </div>
+
+              {/* Function Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Function Type</label>
+                <select
+                  value={functionType}
+                  onChange={(e) => setFunctionType(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="scan">Scan</option>
+                  <option value="live_data">Live Data</option>
+                  <option value="vin">vin</option>
+                  <option value="clear_codes">Clear Codes</option>
+                </select>
+              </div>
+
+              {/* Full Scan Toggle */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Scan Type</label>
+                <div className="flex items-center space-x-3 py-2">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={fullScan}
+                      onChange={(e) => setFullScan(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Full Scan</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Search */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Search Commands</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search commands or modules..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Module Selection */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select Modules</label>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                {availableModules.map((module) => (
+                  <label key={module} className="flex items-center space-x-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={selectedModules.includes(module)}
+                      onChange={() => handleModuleToggle(module)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-gray-700 truncate" title={module}>
+                      {module}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={fetchCommands}
+                disabled={loading || selectedModules.length === 0}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Fetch Commands
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={downloadExcel}
+                disabled={filteredCommands.length === 0}
+                className="inline-flex items-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download CSV
+              </button>
+            </div>
+          </div>
+
+          {/* Error Display */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-3 mb-6">
+              <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="font-medium text-red-900">Error</h4>
+                <p className="text-red-700 text-sm mt-1">{error}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Results Section */}
+          {filteredCommands.length > 0 && (
+            <div className="space-y-4">
+              {/* Results Summary */}
+              <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <Car className="w-5 h-5 text-blue-600" />
+                  <span className="font-medium text-blue-900">
+                    {pagination.totalItems} commands found for {make}
+                  </span>
+                  {searchTerm && (
+                    <span className="text-sm text-blue-700">
+                      (filtered by "{searchTerm}")
+                    </span>
+                  )}
+                </div>
+                <div className="text-sm text-blue-700">
+                  Modules: {selectedModules.join(', ')}
+                </div>
+              </div>
+
+              {/* Pagination Controls */}
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-700">
+                  Showing {((pagination.currentPage - 1) * pagination.itemsPerPage) + 1} to{' '}
+                  {Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)} of{' '}
+                  {pagination.totalItems} commands
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => handlePageChange(pagination.currentPage - 1)}
+                    disabled={pagination.currentPage === 1}
+                    className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </button>
+                  
+                  <span className="text-sm text-gray-700">
+                    Page {pagination.currentPage} of {pagination.totalPages}
+                  </span>
+                  
+                  <button
+                    onClick={() => handlePageChange(pagination.currentPage + 1)}
+                    disabled={pagination.currentPage === pagination.totalPages}
+                    className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Commands Table */}
+              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Command
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Module
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Type
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {getPaginatedData().map((command, index) => (
+                        <tr key={index} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <code className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
+                              {command.command}
+                            </code>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {command.module}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {command.command.startsWith('AT') ? 'Setup' : 'Diagnostic'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Bottom Pagination */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <label className="text-sm text-gray-700">Items per page:</label>
+                  <select
+                    value={pagination.itemsPerPage}
+                    onChange={(e) => setPagination(prev => ({
+                      ...prev,
+                      itemsPerPage: parseInt(e.target.value),
+                      currentPage: 1
+                    }))}
+                    className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value={10}>10</option>
+                    <option value={30}>30</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => handlePageChange(1)}
+                    disabled={pagination.currentPage === 1}
+                    className="px-3 py-1 border border-gray-300 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    First
+                  </button>
+                  <button
+                    onClick={() => handlePageChange(pagination.currentPage - 1)}
+                    disabled={pagination.currentPage === 1}
+                    className="inline-flex items-center px-3 py-1 border border-gray-300 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </button>
+                  
+                  {/* Page Numbers */}
+                  {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                    const startPage = Math.max(1, pagination.currentPage - 2);
+                    const pageNum = startPage + i;
+                    if (pageNum > pagination.totalPages) return null;
+                    
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`px-3 py-1 border rounded text-sm font-medium transition-colors ${
+                          pageNum === pagination.currentPage
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                  
+                  <button
+                    onClick={() => handlePageChange(pagination.currentPage + 1)}
+                    disabled={pagination.currentPage === pagination.totalPages}
+                    className="inline-flex items-center px-3 py-1 border border-gray-300 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handlePageChange(pagination.totalPages)}
+                    disabled={pagination.currentPage === pagination.totalPages}
+                    className="px-3 py-1 border border-gray-300 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Last
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && filteredCommands.length === 0 && !error && (
+            <div className="text-center py-12">
+              <FileSpreadsheet className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Commands Found</h3>
+              <p className="text-gray-500 mb-4">
+                {commands.length === 0 
+                  ? 'Click "Fetch Commands" to load diagnostic commands'
+                  : 'No commands match your search criteria'
+                }
+              </p>
+              {commands.length === 0 && (
+                <button
+                  onClick={fetchCommands}
+                  disabled={selectedModules.length === 0}
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Fetch Commands
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* API Info */}
+          {/* <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <h3 className="font-medium text-gray-900 mb-2">API Endpoint Information</h3>
+            <div className="text-sm text-gray-600 space-y-1">
+              <p><strong>Endpoint:</strong> /api/CommandAPI</p>
+              <p><strong>Method:</strong> GET</p>
+              <p><strong>Parameters:</strong></p>
+              <ul className="ml-4 space-y-1">
+                <li>• make: {make}</li>
+                <li>• module: {JSON.stringify(selectedModules)}</li>
+                <li>• function_type: {functionType}</li>
+                <li>• full_scan: {fullScan.toString()}</li>
+              </ul>
+            </div>
+          </div> */}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Api2;
+export default CommandAPIFrontend;
