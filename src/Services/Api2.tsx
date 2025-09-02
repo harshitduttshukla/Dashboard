@@ -1,6 +1,3 @@
-
-
-
 import { useState, useEffect, } from 'react';
 import { Search, ChevronLeft, ChevronRight, Car, Settings, FileSpreadsheet, RefreshCw, AlertCircle } from 'lucide-react';
 
@@ -31,7 +28,7 @@ const CommandAPIFrontend = () => {
   
   // Search and filter states
   const [make, setMake] = useState<string>('Honda');
-  const [selectedModules, setSelectedModules] = useState<string[]>(['Engine', 'ABS']);
+  const [selectedModules, setSelectedModules] = useState<string>('Engine, ABS');
   const [functionType, setFunctionType] = useState<string>('scan');
   const [fullScan, setFullScan] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -45,23 +42,7 @@ const CommandAPIFrontend = () => {
   });
 
   // Available modules (extracted from your data)
-  const availableModules = [
-    'Engine',
-    'EPS',
-    'Acoustic Vehicle Alerting System',
-    'Gauge system',
-    'ABS/EBCM',
-    'Immobilizer',
-    'Airbag',
-    'Vehicle Stability Assist(VSA)',
-    'Head Up Display',
-    'i-Shift (AMT)',
-    'Electric Servo Brake System',
-    'CAN Gateway',
-    'Intake Sound Creator',
-    'HVAC',
-    'Others'
-  ];
+ 
 
   const fetchCommands = async () => {
     setLoading(true);
@@ -75,8 +56,9 @@ const CommandAPIFrontend = () => {
         full_scan: fullScan.toString()
       });
       
-      // Add modules as JSON array
-      params.append('module', JSON.stringify(selectedModules));
+      // Convert selectedModules string to array for API
+      const modulesArray = selectedModules.split(',').map(m => m.trim()).filter(m => m);
+      params.append('module', JSON.stringify(modulesArray));
       
       const possibleEndpoints = [
         `${BASE_URL}/api/CommandAPI?${params}`,
@@ -182,16 +164,6 @@ const CommandAPIFrontend = () => {
     }
   };
 
-  const handleModuleToggle = (module: string) => {
-    setSelectedModules(prev => {
-      if (prev.includes(module)) {
-        return prev.filter(m => m !== module);
-      } else {
-        return [...prev, module];
-      }
-    });
-  };
-
   
 
   // Auto-fetch on component mount
@@ -220,16 +192,13 @@ const CommandAPIFrontend = () => {
               {/* Vehicle Make */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Vehicle Make</label>
-                <select
+                <input
+                  type="text"
+                  placeholder="Enter vehicle make..."
                   value={make}
                   onChange={(e) => setMake(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="Honda">Honda</option>
-                  <option value="Toyota">Toyota</option>
-                  <option value="Ford">Ford</option>
-                  <option value="BMW">BMW</option>
-                </select>
+                />
               </div>
 
               {/* Function Type */}
@@ -282,28 +251,23 @@ const CommandAPIFrontend = () => {
             {/* Module Selection */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">Select Modules</label>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
-                {availableModules.map((module) => (
-                  <label key={module} className="flex items-center space-x-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={selectedModules.includes(module)}
-                      onChange={() => handleModuleToggle(module)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <span className="text-gray-700 truncate" title={module}>
-                      {module}
-                    </span>
-                  </label>
-                ))}
-              </div>
+              <input
+                type="text"
+                placeholder="Enter modules (comma separated)..."
+                value={selectedModules}
+                onChange={(e) => setSelectedModules(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Example: Engine, ABS, HVAC
+              </p>
             </div>
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={fetchCommands}
-                disabled={loading || selectedModules.length === 0}
+                disabled={loading || !selectedModules.trim()}
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {loading ? (
@@ -351,7 +315,7 @@ const CommandAPIFrontend = () => {
                   )}
                 </div>
                 <div className="text-sm text-blue-700">
-                  Modules: {selectedModules.join(', ')}
+                  Modules: {selectedModules}
                 </div>
               </div>
 
@@ -489,7 +453,7 @@ const CommandAPIFrontend = () => {
               {commands.length === 0 && (
                 <button
                   onClick={fetchCommands}
-                  disabled={selectedModules.length === 0}
+                  disabled={!selectedModules.trim()}
                   className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
