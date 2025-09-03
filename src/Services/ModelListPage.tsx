@@ -72,7 +72,7 @@ const ModelListPage: React.FC = () => {
 
     // Create download link
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    // const link = document.createElement('a');
     
     // Generate filename with current date and make
     const now = new Date();
@@ -80,17 +80,35 @@ const ModelListPage: React.FC = () => {
     const filename = `Model_List_${selectedMake}_${dateStr}.csv`;
 
     // Download file
-    if (navigator.msSaveBlob) {
-      // IE 10+
-      navigator.msSaveBlob(blob, filename);
-    } else {
-      link.href = URL.createObjectURL(blob);
-      link.download = filename;
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+    // if (navigator.msSaveBlob) {
+    //   // IE 10+
+    //   navigator.msSaveBlob(blob, filename);
+    // } else {
+    //   link.href = URL.createObjectURL(blob);
+    //   link.download = filename;
+    //   link.style.visibility = 'hidden';
+    //   document.body.appendChild(link);
+    //   link.click();
+    //   document.body.removeChild(link);
+    // }
+
+
+    // Fix typing issue by safely checking (msSaveBlob exists only in IE)
+const nav: any = navigator;
+
+if (typeof nav.msSaveBlob === "function") {
+  nav.msSaveBlob(blob, filename); // IE 10+
+} else {
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}
+
   };
 
   useEffect(() => {

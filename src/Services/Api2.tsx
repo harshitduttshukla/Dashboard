@@ -172,7 +172,7 @@ const CommandAPIFrontend = () => {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
+    <div className="max-w-7xl mx-auto p-6 ml-10 bg-gray-50 min-h-screen">
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-8">
@@ -256,7 +256,7 @@ const CommandAPIFrontend = () => {
                 placeholder="Enter modules (comma separated)..."
                 value={selectedModules}
                 onChange={(e) => setSelectedModules(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-70 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Example: Engine, ABS, HVAC
