@@ -130,7 +130,7 @@ const UsersTable: React.FC = () => {
         {/* Filters and Buttons */}
         <div className="flex flex-col gap-4 mb-6">
           {/* Filters row */}
-          <div className="flex flex-wrap gap-4">
+          {/* <div className="flex flex-wrap gap-4">
             <input
               type="text"
               placeholder="Email"
@@ -158,7 +158,46 @@ const UsersTable: React.FC = () => {
             >
               Filter
             </button>
-          </div>
+          </div> */}
+
+          <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setPage(1);
+            fetchUsers();
+          }}
+          >
+        <div className="flex flex-wrap gap-4">
+          <input
+            type="text"
+            placeholder="Email"
+            className="border border-gray-300 px-4 py-2 rounded-md w-52 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={filters.email}
+            onChange={(e) => setFilters({ ...filters, email: e.target.value })}
+          />
+          <input
+            type="text"
+            placeholder="Plan"
+            className="border border-gray-300 px-4 py-2 rounded-md w-52 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={filters.plan}
+            onChange={(e) => setFilters({ ...filters, plan: e.target.value })}
+          />
+          <input
+            type="text"
+            placeholder="Status"
+            className="border border-gray-300 px-4 py-2 rounded-md w-52 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={filters.status}
+            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+          />
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition-all"
+          >
+            Filter
+          </button>
+        </div>
+      </form>
+
           
           {/* Excel Download Button */}
           <div className="flex">

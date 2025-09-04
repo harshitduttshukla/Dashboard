@@ -159,52 +159,47 @@ const SPFCommands: React.FC = () => {
       {/* Search Inputs and Buttons */}
       <div className="flex flex-col gap-4 mb-6 justify-center">
         {/* Search inputs row */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <input
-            type="text"
-            value={make}
-            onChange={(e) => setMake(e.target.value)}
-            placeholder="e.g. Hyundai"
-            className="border px-4 py-2 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="text"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-            placeholder="e.g. i20"
-            className="border px-4 py-2 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="text"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            placeholder="e.g. 2020"
-            className="border px-4 py-2 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            onClick={() => {
-              setPage(1); // Reset page on new search
-              fetchData();
-            }}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition"
-          >
-            Fetch SPF
-          </button>
-        </div>
         
-        {/* Excel Download Button */}
-        {/* <div className="flex justify-end">
-          <button
-            onClick={downloadExcel}
-            disabled={loading || data.length === 0}
-            className="bg-blue-300 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2 rounded transition flex items-center gap-2"
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault(); // prevent full page reload
+              setPage(1); // Reset page
+              fetchData(); // Trigger search
+            }}
+            className="flex flex-col sm:flex-row gap-4 w-full justify-center"
           >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M3 17a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2zM3.293 7.707A1 1 0 014 7h3V3a1 1 0 011-1h4a1 1 0 011 1v4h3a1 1 0 01.707 1.707l-7 7a1 1 0 01-1.414 0l-7-7z"/>
-            </svg>
-            Download Excel
-          </button>
-        </div> */}
+            <input
+              type="text"
+              value={make}
+              onChange={(e) => setMake(e.target.value)}
+              placeholder="e.g. Hyundai"
+              className="border px-4 py-2 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
+            />
+            <input
+              type="text"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              placeholder="e.g. i20"
+              className="border px-4 py-2 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
+            />
+            <input
+              type="text"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              placeholder="e.g. 2020"
+              className="border px-4 py-2 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              type="submit" // ✅ Enter key works now
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition"
+            >
+              Fetch SPF
+            </button>
+          </form>
+        </div>
+
+        
       </div>
 
       {/* Status Messages */}

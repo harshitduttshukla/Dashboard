@@ -1,14 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
 import { useEffect, useState, useCallback, useRef } from "react";
 
 type ActuationDetail = {
@@ -200,35 +189,24 @@ const ActuationFetcher = () => {
     
     filename += '.csv';
 
-    // Download file
-    // if (navigator.msSaveBlob) {
-    //   // IE 10+
-    //   navigator.msSaveBlob(blob, filename);
-    // } else {
-    //   link.href = URL.createObjectURL(blob);
-    //   link.download = filename;
-    //   link.style.visibility = 'hidden';
-    //   document.body.appendChild(link);
-    //   link.click();
-    //   document.body.removeChild(link);
-    // }
+    
 
 
-// Fix typing issue by safely checking (msSaveBlob exists only in IE)
-const nav: any = navigator;
 
-if (typeof nav.msSaveBlob === "function") {
-  nav.msSaveBlob(blob, filename); // IE 10+
-} else {
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  window.URL.revokeObjectURL(url);
-}
+        const nav: any = navigator;
+
+        if (typeof nav.msSaveBlob === "function") {
+          nav.msSaveBlob(blob, filename); // IE 10+
+        } else {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        }
 
 
 
@@ -253,33 +231,40 @@ if (typeof nav.msSaveBlob === "function") {
 
       {/* Search box */}
       <div className="bg-white border rounded-lg shadow-sm p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-          <input
-            className="border px-4 py-2 rounded"
-            placeholder="Make"
-            value={make}
-            onChange={(e) => setMake(e.target.value)}
-          />
-          <input
-            className="border px-4 py-2 rounded"
-            placeholder="Model"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-          />
-          <input
-            className="border px-4 py-2 rounded"
-            placeholder="Year"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-          />
-          <button
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
-            onClick={handleSearch}
-            disabled={loading}
+         <form
+            onSubmit={(e) => {
+              e.preventDefault(); // stop full page reload
+              handleSearch();
+            }}
           >
-            {loading ? "Loading..." : "Fetch"}
-          </button>
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+              <input
+                className="border px-4 py-2 rounded"
+                placeholder="Make"
+                value={make}
+                onChange={(e) => setMake(e.target.value)}
+              />
+              <input
+                className="border px-4 py-2 rounded"
+                placeholder="Model"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+              />
+              <input
+                className="border px-4 py-2 rounded"
+                placeholder="Year"
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+              />
+              <button
+                type="submit" // ✅ makes Enter work
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
+                disabled={loading}
+              >
+                {loading ? "Loading..." : "Fetch"}
+              </button>
+            </div>
+          </form>
         
         {/* Download Excel Button */}
         <div className="flex justify-end">
@@ -296,13 +281,11 @@ if (typeof nav.msSaveBlob === "function") {
         </div>
       </div>
 
-      {loading && (
-        <div className="text-blue-500 text-center flex items-center justify-center gap-2 py-8">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-          <span className="text-lg">Loading data...</span>
-        </div>
-      )}
+     
       {error && <p className="text-red-500 text-center py-4 text-lg">{error}</p>}
+
+
+
 
       {/* Data display */}
       <div className="flex-1 overflow-auto space-y-6">

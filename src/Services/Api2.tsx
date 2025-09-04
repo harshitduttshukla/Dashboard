@@ -61,9 +61,8 @@ const CommandAPIFrontend = () => {
       params.append('module', JSON.stringify(modulesArray));
       
       const possibleEndpoints = [
-        `${BASE_URL}/api/CommandAPI?${params}`,
         `${BASE_URL}api/CommandAPI?${params}`,
-        `/api/CommandAPI?${params}`
+       
       ];
 
       let response: Response | undefined;
@@ -186,8 +185,16 @@ const CommandAPIFrontend = () => {
         </div>
 
         <div className="p-6">
-          {/* Search and Filter Section */}
-          <div className="bg-gray-50 rounded-lg p-6 mb-6">
+          
+        <div>
+          
+             <form
+            onSubmit={(e) => {
+              e.preventDefault(); // prevent page reload
+              fetchCommands();    // trigger your function
+            }}
+            className="bg-gray-50 rounded-lg p-6 mb-6"
+            >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
               {/* Vehicle Make */}
               <div>
@@ -266,7 +273,7 @@ const CommandAPIFrontend = () => {
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3">
               <button
-                onClick={fetchCommands}
+                type="submit"   
                 disabled={loading || !selectedModules.trim()}
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
@@ -282,10 +289,9 @@ const CommandAPIFrontend = () => {
                   </>
                 )}
               </button>
-
-           
             </div>
-          </div>
+          </form>
+        </div>  
 
           {/* Error Display */}
           {error && (

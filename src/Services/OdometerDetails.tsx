@@ -3,6 +3,43 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const ITEMS_PER_PAGE = 30;
 
+
+
+const TableHead: React.FC<{columns : string[]}> = ({columns}) => {
+    return(
+      <thead className="bg-gray-100 text-gray-700">
+        <tr>
+          {
+            columns.map((col,idx) => (
+              <th
+              key={idx}
+              className="border px-3 py-2 text-left"
+              >
+                {col}
+              </th>
+            ))
+          }
+        </tr>
+
+      </thead>
+    )
+}
+
+const columns = [
+  "Header",
+  "Sub Header",
+  "PID",
+  "Protocol",
+  "System",
+  "Init",
+  "Formula Based",
+  "Generic",
+  "Formula (Metric)",
+  "Formula (Imperial)",
+  "Unit (Metric)",
+  "Unit (Imperial)"
+];
+
 const OdometerDetails: React.FC = () => {
   const [odometerData, setOdometerData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -154,34 +191,23 @@ const OdometerDetails: React.FC = () => {
     
     filename += '.csv';
 
-    // Download file
-    // if (navigator.msSaveBlob) {
-    //   // IE 10+
-    //   navigator.msSaveBlob(blob, filename);
-    // } else {
-    //   link.href = URL.createObjectURL(blob);
-    //   link.download = filename;
-    //   link.style.visibility = 'hidden';
-    //   document.body.appendChild(link);
-    //   link.click();
-    //   document.body.removeChild(link);
-    // }
+   
 
-// Fix typing issue by safely checking (msSaveBlob exists only in IE)
-const nav: any = navigator;
+      // Fix typing issue by safely checking (msSaveBlob exists only in IE)
+      const nav: any = navigator;
 
-if (typeof nav.msSaveBlob === "function") {
-  nav.msSaveBlob(blob, filename); // IE 10+
-} else {
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  window.URL.revokeObjectURL(url);
-}
+      if (typeof nav.msSaveBlob === "function") {
+        nav.msSaveBlob(blob, filename); // IE 10+
+      } else {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      }
 
 
 
@@ -206,7 +232,7 @@ if (typeof nav.msSaveBlob === "function") {
 
       {/* Search box */}
       <div className="bg-white border rounded-lg shadow-sm p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <input
             type="text"
             value={make}
@@ -235,7 +261,45 @@ if (typeof nav.msSaveBlob === "function") {
           >
             {loading ? "Loading..." : "Fetch"}
           </button>
-        </div>
+        </div> */}
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault(); // prevent page refresh
+              handleSearch();     // trigger your search
+            }}
+            className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4"
+          >
+            <input
+              type="text"
+              value={make}
+              onChange={(e) => setMake(e.target.value)}
+              placeholder="Make"
+              className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <input
+              type="text"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              placeholder="Model"
+              className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <input
+              type="text"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              placeholder="Year"
+              className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              type="submit" // ✅ Enter key will trigger this
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "Fetch"}
+            </button>
+          </form>
+
 
         {/* Download Excel Button */}
         <div className="flex justify-end mt-3">
@@ -251,12 +315,7 @@ if (typeof nav.msSaveBlob === "function") {
         </div>
       </div>
 
-      {loading && (
-        <div className="text-blue-500 text-center flex items-center justify-center gap-2 py-8">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-          <span className="text-lg">Loading odometer data...</span>
-        </div>
-      )}
+      
       {error && <p className="text-red-500 text-center py-4 text-lg">{error}</p>}
 
       {/* Data display */}
@@ -282,22 +341,9 @@ if (typeof nav.msSaveBlob === "function") {
             
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm border">
-                <thead className="bg-gray-100 text-gray-700">
-                  <tr>
-                    <th className="border px-3 py-2 text-left">Header</th>
-                    <th className="border px-3 py-2 text-left">Sub Header</th>
-                    <th className="border px-3 py-2 text-left">PID</th>
-                    <th className="border px-3 py-2 text-left">Protocol</th>
-                    <th className="border px-3 py-2 text-left">System</th>
-                    <th className="border px-3 py-2 text-left">Init</th>
-                    <th className="border px-3 py-2 text-left">Formula Based</th>
-                    <th className="border px-3 py-2 text-left">Generic</th>
-                    <th className="border px-3 py-2 text-left">Formula (Metric)</th>
-                    <th className="border px-3 py-2 text-left">Formula (Imperial)</th>
-                    <th className="border px-3 py-2 text-left">Unit (Metric)</th>
-                    <th className="border px-3 py-2 text-left">Unit (Imperial)</th>
-                  </tr>
-                </thead>
+                
+
+                  <TableHead columns={columns} />
                 <tbody>
                   {odometerData.map((item, idx) => (
                     <tr key={idx} className="hover:bg-gray-50">

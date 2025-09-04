@@ -122,7 +122,7 @@ const GetCoverage = () => {
       {/* Filter and Buttons */}
       <div className="flex flex-col gap-4 mb-6">
         {/* Filter row */}
-        <div className="flex gap-4">
+        {/* <div className="flex gap-4">
           <input
             type="text"
             placeholder="Enter car make (e.g. Hyundai)"
@@ -136,7 +136,31 @@ const GetCoverage = () => {
           >
             Search
           </button>
-        </div>
+        </div> */}
+
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault(); // stop page reload
+            handleSearch();     // call your search
+          }}
+          className="flex gap-4"
+        >
+          <input
+            type="text"
+            placeholder="Enter car make (e.g. Hyundai)"
+            value={make}
+            onChange={(e) => setMake(e.target.value)}
+            className="border border-gray-300 px-4 py-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
+          >
+            Search
+          </button>
+        </form>
+
         
         {/* Excel Download Button */}
         <div className="flex justify-end">

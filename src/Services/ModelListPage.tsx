@@ -79,20 +79,6 @@ const ModelListPage: React.FC = () => {
     const dateStr = now.toISOString().split('T')[0];
     const filename = `Model_List_${selectedMake}_${dateStr}.csv`;
 
-    // Download file
-    // if (navigator.msSaveBlob) {
-    //   // IE 10+
-    //   navigator.msSaveBlob(blob, filename);
-    // } else {
-    //   link.href = URL.createObjectURL(blob);
-    //   link.download = filename;
-    //   link.style.visibility = 'hidden';
-    //   document.body.appendChild(link);
-    //   link.click();
-    //   document.body.removeChild(link);
-    // }
-
-
     // Fix typing issue by safely checking (msSaveBlob exists only in IE)
 const nav: any = navigator;
 
@@ -123,23 +109,33 @@ if (typeof nav.msSaveBlob === "function") {
 
       {/* Search Section */}
       <div className="bg-white border rounded-lg shadow-sm p-6 mb-6">
+        
         <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-4">
-          <label className="font-medium text-gray-700">Enter Make:</label>
-          <input
-            type="text"
-            value={selectedMake}
-            onChange={(e) => setSelectedMake(e.target.value)}
-            className="border px-4 py-2 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
-            placeholder="Type a make (e.g., Mahindra)"
-          />
-          <button
-            onClick={fetchModels}
-            disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition disabled:opacity-50"
+          <form
+            onSubmit={(e) => {
+              e.preventDefault(); 
+              fetchModels(); 
+            }}
+            className="flex flex-col md:flex-row items-center gap-4"
           >
-            {loading ? "Loading..." : "Fetch Models"}
-          </button>
+            <label className="font-medium text-gray-700">Enter Make:</label>
+            <input
+              type="text"
+              value={selectedMake}
+              onChange={(e) => setSelectedMake(e.target.value)}
+              className="border px-4 py-2 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+              placeholder="Type a make (e.g., Mahindra)"
+            />
+            <button
+              type="submit" // ✅ pressing Enter will submit the form
+              disabled={loading}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition disabled:opacity-50"
+            >
+              {loading ? "Loading..." : "Fetch Models"}
+            </button>
+          </form>
         </div>
+
 
         {/* Download Excel Button */}
         <div className="flex justify-end">

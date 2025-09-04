@@ -177,7 +177,7 @@ const ActuationsDetail = () => {
       {/* Filters Section and Excel Download Button */}
       <div className="flex flex-col gap-4 mb-6">
         {/* Filters row */}
-        <div className="flex flex-wrap gap-4">
+        {/* <div className="flex flex-wrap gap-4">
           {Object.keys(filters).map((key) => (
             <div key={key} className="flex flex-col w-52">
               <label className="mb-1 font-semibold capitalize">
@@ -203,9 +203,44 @@ const ActuationsDetail = () => {
           >
             Filter
           </button>
-        </div>
+        </div> */}
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault(); // prevents page reload
+            setPage(1);
+            fetchData();
+          }}
+        >
+          <div className="flex flex-wrap gap-4">
+            {Object.keys(filters).map((key) => (
+              <div key={key} className="flex flex-col w-52">
+                <label className="mb-1 font-semibold capitalize">
+                  {key.replace(/_/g, " ")}
+                </label>
+                <input
+                  type="text"
+                  placeholder={key.replace(/_/g, " ")}
+                  className="border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={filters[key as keyof Filters]}
+                  onChange={(e) =>
+                    handleFilterChange(key as keyof Filters, e.target.value)
+                  }
+                />
+              </div>
+            ))}
+
+            <button
+              type="submit" // ✅ Enter key submits the form
+              className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition-all self-end"
+            >
+              Filter
+            </button>
+          </div>
+        </form>
+
         
-        {/* Excel Download Button */}
+       
         <div className="flex justify-end">
           <button
             onClick={downloadExcel}

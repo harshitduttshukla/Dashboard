@@ -101,7 +101,7 @@ const CustomCommands: React.FC = () => {
       {/* Filters and Buttons */}
       <div className="flex flex-col gap-4 mb-6">
         {/* Filters row */}
-        <div className="flex flex-wrap gap-4">
+        {/* <div className="flex flex-wrap gap-4">
           <input
             type="text"
             placeholder="Make"
@@ -132,7 +132,46 @@ const CustomCommands: React.FC = () => {
           >
             Search
           </button>
-        </div>
+        </div> */}
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault(); // prevent page reload
+            setPage(1);
+            fetchCustomCommands(1);
+          }}
+        >
+          <div className="flex flex-wrap gap-4">
+            <input
+              type="text"
+              placeholder="Make"
+              className="border border-gray-300 px-4 py-2 rounded-md w-52 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={make}
+              onChange={(e) => setMake(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Model"
+              className="border border-gray-300 px-4 py-2 rounded-md w-52 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Year"
+              className="border border-gray-300 px-4 py-2 rounded-md w-52 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+            />
+            <button
+              type="submit" // ✅ makes Enter work
+              className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition-all"
+            >
+              Search
+            </button>
+          </div>
+        </form>
+
         
       
       </div>

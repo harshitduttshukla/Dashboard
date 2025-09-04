@@ -78,39 +78,27 @@ const BikeMakeList: React.FC = () => {
     const dateStr = now.toISOString().split('T')[0];
     const filename = `Bike_Makes_${segment}_${dateStr}.csv`;
 
-    // Download file
-    // if (navigator.msSaveBlob) {
-    //   // IE 10+
-    //   navigator.msSaveBlob(blob, filename);
-    // } else {
-    //   link.href = URL.createObjectURL(blob);
-    //   link.download = filename;
-    //   link.style.visibility = 'hidden';
-    //   document.body.appendChild(link);
-    //   link.click();
-    //   document.body.removeChild(link);
-    // }
+   
 
+    // Fix typing issue by safely checking (msSaveBlob exists only in IE)
+    const nav: any = navigator;
 
-// Fix typing issue by safely checking (msSaveBlob exists only in IE)
-const nav: any = navigator;
-
-if (typeof nav.msSaveBlob === "function") {
-  nav.msSaveBlob(blob, filename); // IE 10+
-} else {
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  window.URL.revokeObjectURL(url);
-}
+    if (typeof nav.msSaveBlob === "function") {
+      nav.msSaveBlob(blob, filename); // IE 10+
+    } else {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    }
 
 
 
-  };
+      };
 
 
 
@@ -124,7 +112,7 @@ if (typeof nav.msSaveBlob === "function") {
         Bike Make List
       </h1>
 
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <label className="block text-gray-700">Enter Segment:</label>
         <input
           type="text"
@@ -139,7 +127,32 @@ if (typeof nav.msSaveBlob === "function") {
         className="w-full bg-blue-500 text-white p-2 rounded mb-4"
       >
         Fetch Bike Makes
-      </button>
+      </button> */}
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); // prevent page refresh
+          fetchBikeMakes();   // call your function
+        }}
+        className="mb-4"
+      >
+        <label className="block text-gray-700">Enter Segment:</label>
+        <input
+          type="text"
+          value={segment}
+          onChange={handleSegmentChange}
+          className="w-full p-2 mt-2 border border-gray-300 rounded"
+          placeholder="e.g. Sports"
+        />
+
+        <button
+          type="submit" // ✅ Enter will trigger this
+          className="w-full bg-blue-500 text-white p-2 rounded mt-4"
+        >
+          Fetch Bike Makes
+        </button>
+      </form>
+
 
       {/* Download Excel Button */}
       <div className="flex justify-end mb-4">
