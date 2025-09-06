@@ -315,7 +315,7 @@ const ActuationsDetail = () => {
                         ScanArray: item.scanResArray,   // adjust if your field name is different
                         created_at: item.created_at,
                         updated_at: item.updated_at,
-                        email: item.email,
+                        email: item.user_email,
                         make: item.make,
                         model: item.model,
                       },

@@ -19,7 +19,7 @@ type ActuationGroup = {
 };
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 200;
 
 const ActuationFetcher = () => {
   const [make, setMake] = useState("");
