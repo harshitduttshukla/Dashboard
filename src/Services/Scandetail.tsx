@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import HeaderAndValue from "../ReusedCompontets/HeaderAndValue"
+import { useNavigate } from "react-router-dom";
 
+// inside component
+// const navigate = useNavigate();
 
 
 interface DecodedArrayItem {
@@ -73,6 +76,8 @@ const Scandetail = () => {
   });
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+
+  const navigate = useNavigate(); 
 
   const fetchData = async () => {
     try {
@@ -195,27 +200,7 @@ const Scandetail = () => {
 
       <div className="flex flex-col gap-4 mb-6">
         {/* Filters row */}
-        {/* <div className="flex flex-wrap gap-4">
-          {Object.keys(filters).map((key) => (
-            <input
-              key={key}
-              type={key.includes('time') ? 'date' : key === 'country_id' ? 'number' : 'text'}
-              placeholder={key}
-              className="border border-gray-300 px-4 py-2 rounded-md w-52 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={filters[key as keyof Filters]}
-              onChange={(e) => handleFilterChange(key as keyof Filters, e.target.value)}
-            />
-          ))}
-          <button
-            onClick={() => {
-              setPage(1);
-              fetchData();
-            }}
-            className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition-all"
-          >
-            Filter
-          </button>
-        </div> */}
+       
 
         <form
             onSubmit={(e) => {
@@ -320,11 +305,34 @@ const Scandetail = () => {
                 )}
               </td>
               <td className="border px-4 py-2">
-                <button
+                {/* <button
                   onClick={() => {
                     // Mock navigation - in real app use navigate
                     console.log('Navigate to details with scan data:', scan.id);
                   }}
+                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                >
+                  View Details
+                </button> */}
+
+                
+                <button
+                  onClick={() =>
+                    navigate("/ObdScanReport/details", {
+                      state: {
+                        ScanArray: scan.scanResArray,
+                        DecodeArray: scan.decodedArray,
+                        start_time: scan.scan_start_time,
+                        end_time: scan.scan_end_time,
+                        license_plate: scan.license_plate,
+                        email: scan.email,
+                        App_version: scan.app_version,
+                        scan_ended: scan.scan_ended,
+                        functiones: scan.function,
+                        type: scan.type,
+                      },
+                    })
+                  }
                   className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                 >
                   View Details

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as XLSX from 'xlsx';
 
 // Mock HeaderAndValue component since we can't import it
@@ -53,6 +54,7 @@ const ActuationsDetail = () => {
   });
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const navigate = useNavigate()
 
   const fetchData = async () => {
     try {
@@ -296,7 +298,7 @@ const ActuationsDetail = () => {
                 Title={new Date(item.updated_at).toLocaleString()}
               />
               <td className="border px-4 py-2">
-                <button
+                {/* <button
                   onClick={() => {
                     // Mock navigation - in real app use navigate
                     console.log('Navigate to details with actuation data:', item);
@@ -304,7 +306,26 @@ const ActuationsDetail = () => {
                   className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                 >
                   View Details
+                </button> */}
+
+                <button
+                  onClick={() =>
+                    navigate("/ActuationsDetail/details", {
+                      state: {
+                        ScanArray: item.scanResArray,   // adjust if your field name is different
+                        created_at: item.created_at,
+                        updated_at: item.updated_at,
+                        email: item.email,
+                        make: item.make,
+                        model: item.model,
+                      },
+                    })
+                  }
+                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                >
+                  View Details
                 </button>
+
               </td>
             </tr>
           ))}

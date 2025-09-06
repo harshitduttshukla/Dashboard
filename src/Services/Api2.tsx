@@ -38,7 +38,7 @@ const CommandAPIFrontend = () => {
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
-    itemsPerPage: 20
+    itemsPerPage: 100
   });
 
   // Available modules (extracted from your data)

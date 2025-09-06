@@ -16,7 +16,7 @@ type SPFCommand = {
 };
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL; // API base URL
-const ITEMS_PER_PAGE = 30; // Number of items per page
+const ITEMS_PER_PAGE = 200; // Number of items per page
 
 const SPFCommands: React.FC = () => {
   const [make, setMake] = useState("");

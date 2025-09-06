@@ -1,11 +1,7 @@
-
-
-
-
-
 import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import HeaderAndValue from "../ReusedCompontets/HeaderAndValue"
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -66,6 +62,7 @@ const SpecialFunctionsDetail = () => {
   });
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+   const navigate = useNavigate(); 
 
   const fetchData = async () => {
     try {
@@ -189,54 +186,7 @@ const SpecialFunctionsDetail = () => {
       {/* Filters Section and Excel Download Button */}
       <div className="flex flex-col gap-4 mb-6">
         {/* Filters row */}
-        {/* <div className="flex flex-wrap gap-4">
-          {Object.keys(filters).map((key) => (
-            <div key={key} className="flex flex-col w-52">
-              <label className="mb-1 font-semibold capitalize">
-                {key.replace(/_/g, ' ')}
-              </label>
-              <input
-                type={
-                  key.includes('time')
-                    ? 'date'
-                    : key === 'hard_coded'
-                    ? 'checkbox'
-                    : 'text'
-                }
-                placeholder={key.replace(/_/g, ' ')}
-                className="border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={
-                  key === 'hard_coded'
-                    ? undefined
-                    : filters[key as keyof Filters]
-                }
-                checked={
-                  key === 'hard_coded'
-                    ? filters[key as keyof Filters] === 'true'
-                    : undefined
-                }
-                onChange={(e) =>
-                  handleFilterChange(
-                    key as keyof Filters,
-                    key === 'hard_coded'
-                      ? (e.target as HTMLInputElement).checked.toString()
-                      : e.target.value
-                  )
-                }
-              />
-            </div>
-          ))}
-          <button
-            onClick={() => {
-              setPage(1);
-              fetchData();
-            }}
-            className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition-all self-end"
-          >
-            Filter
-          </button>
-        </div> */}
-
+      
         <form
             onSubmit={(e) => {
               e.preventDefault(); // stop page reload
@@ -346,7 +296,7 @@ const SpecialFunctionsDetail = () => {
               <HeaderAndValue Title={new Date(item.scan_start_time).toLocaleString()} />
               <HeaderAndValue Title={new Date(item.scan_end_time).toLocaleString()} />
               <td className="border px-4 py-2">
-                <button
+                {/* <button
                   onClick={() => {
                     // Mock navigation - in real app use navigate
                     console.log('Navigate to details with function data:', item);
@@ -354,7 +304,27 @@ const SpecialFunctionsDetail = () => {
                   className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                 >
                   View Details
+                </button> */}
+
+
+
+                <button
+                  onClick={() =>
+                    navigate("/SpecialFunctions/details", {
+                      state: {
+                        ScanArray: item.scanResArray,   // or whatever field holds your scan array
+                        start_time: item.scan_start_time,
+                        end_time: item.scan_end_time,
+                        email: item.user_email,
+                        make: item.make,
+                      },
+                    })
+                  }
+                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                >
+                  View Details
                 </button>
+
               </td>
             </tr>
           ))}
