@@ -5,11 +5,13 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface CommandData {
   function_name: string;
+  make: string;
+  model: string;
   variant: string[];
   commands: Record<string, string[]>;
 }
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 100;
 
 const CustomCommands: React.FC = () => {
   const [data, setData] = useState<CommandData[]>([]);
@@ -45,6 +47,8 @@ const CustomCommands: React.FC = () => {
       if (json.data && Array.isArray(json.data)) {
         const normalizedData: CommandData[] = json.data.map((item: any) => ({
           function_name: item.function_name,
+          make: item.make,
+          model: item.model,
           variant: item.variant || [],
           commands: item.commands?.[0] || {},
         }));
@@ -101,38 +105,7 @@ const CustomCommands: React.FC = () => {
       {/* Filters and Buttons */}
       <div className="flex flex-col gap-4 mb-6">
         {/* Filters row */}
-        {/* <div className="flex flex-wrap gap-4">
-          <input
-            type="text"
-            placeholder="Make"
-            className="border border-gray-300 px-4 py-2 rounded-md w-52 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={make}
-            onChange={(e) => setMake(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Model"
-            className="border border-gray-300 px-4 py-2 rounded-md w-52 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Year"
-            className="border border-gray-300 px-4 py-2 rounded-md w-52 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-          />
-          <button
-            onClick={() => {
-              setPage(1);
-              fetchCustomCommands(1);
-            }}
-            className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition-all"
-          >
-            Search
-          </button>
-        </div> */}
+        
 
         <form
           onSubmit={(e) => {
@@ -192,6 +165,12 @@ const CustomCommands: React.FC = () => {
                   Function Name
                 </th>
                 <th className="px-6 py-3 text-left text-gray-700 font-semibold border-b">
+                  Make
+                </th>
+                <th className="px-6 py-3 text-left text-gray-700 font-semibold border-b">
+                  Model
+                </th>
+                <th className="px-6 py-3 text-left text-gray-700 font-semibold border-b">
                   Variants
                 </th>
                 <th className="px-6 py-3 text-left text-gray-700 font-semibold border-b">
@@ -204,6 +183,12 @@ const CustomCommands: React.FC = () => {
                 <tr key={idx} className="hover:bg-gray-50">
                   <td className="px-6 py-4 border-b text-gray-800 font-medium">
                     {item.function_name}
+                  </td>
+                  <td className="px-6 py-4 border-b text-gray-800 font-medium">
+                    {item.make}
+                  </td>
+                  <td className="px-6 py-4 border-b text-gray-800 font-medium">
+                    {item.model}
                   </td>
                   <td className="px-6 py-4 border-b text-gray-600">
                     {item.variant.join(", ")}
