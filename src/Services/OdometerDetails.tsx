@@ -1,29 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-
+import TableHead  from "../ReusedCompontets/TableHead"
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const ITEMS_PER_PAGE = 30;
-
-
-
-const TableHead: React.FC<{columns : string[]}> = ({columns}) => {
-    return(
-      <thead className="bg-gray-100 text-gray-700">
-        <tr>
-          {
-            columns.map((col,idx) => (
-              <th
-              key={idx}
-              className="border px-3 py-2 text-left"
-              >
-                {col}
-              </th>
-            ))
-          }
-        </tr>
-
-      </thead>
-    )
-}
 
 const columns = [
   "Header",
@@ -45,7 +23,6 @@ const OdometerDetails: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // Default blank values (so API can return "any" data if it supports no filters)
   const [make, setMake] = useState<string>("");
   const [model, setModel] = useState<string>("");
   const [year, setYear] = useState<string>("");
@@ -232,37 +209,6 @@ const OdometerDetails: React.FC = () => {
 
       {/* Search box */}
       <div className="bg-white border rounded-lg shadow-sm p-6 mb-6">
-        {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-          <input
-            type="text"
-            value={make}
-            onChange={(e) => setMake(e.target.value)}
-            placeholder="Make"
-            className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="text"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-            placeholder="Model"
-            className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="text"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            placeholder="Year"
-            className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
-            onClick={handleSearch}
-            disabled={loading}
-          >
-            {loading ? "Loading..." : "Fetch"}
-          </button>
-        </div> */}
-
           <form
             onSubmit={(e) => {
               e.preventDefault(); // prevent page refresh
@@ -299,7 +245,6 @@ const OdometerDetails: React.FC = () => {
               {loading ? "Loading..." : "Fetch"}
             </button>
           </form>
-
 
         {/* Download Excel Button */}
         <div className="flex justify-end mt-3">
@@ -456,13 +401,15 @@ const OdometerDetails: React.FC = () => {
         ) : (
           !error && (
             <div className="text-center py-20">
-              <div className="text-gray-400 text-6xl mb-4">🚗</div>
               <p className="text-gray-500 text-xl">No odometer data to display</p>
               <p className="text-gray-400 mt-2">Try searching with different criteria</p>
             </div>
           )
         )}
       </div>
+
+
+
 
       {/* Pagination */}
       {odometerData.length > 0 && (

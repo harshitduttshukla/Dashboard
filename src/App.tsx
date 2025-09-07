@@ -18,6 +18,7 @@ import SpecilaFunction from "./Services/SpecialFunctions.tsx";
 import ActuationsDetail from "./Services/ActuationsDetail.tsx";
 import FaultCodesUploader from "./Services/FaultCodesUploader.tsx";
 import ActivationCodesUploader from "./Services/ActivationCodesUploader.tsx";
+import LiveDataCommands from "./Services/LiveDataCommands.tsx";
 
 
 
@@ -40,6 +41,7 @@ function App() {
           <Route path="Customcommands1" element={<Customcommands1 />} />
           <Route path="ActuationFetcher" element={<ActuationFetcher />} />
           <Route path="ModelListPage" element={<ModelListPage />} />
+          <Route path="LiveDataCommands" element={<LiveDataCommands />} />
           <Route path="OdometerDetails" element={<OdometerDetails />} />
           <Route path="Updatecommand" element={<FileUploader />} />
           <Route path="FaultCodesUploader" element={<FaultCodesUploader />} />

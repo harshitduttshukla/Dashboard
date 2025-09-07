@@ -18,6 +18,7 @@ const menuItems: MenuItem[] = [
   { label: "Model List Page", path: "/ModelListPage" },
   { label: "Bike Make List", path: "/BikeMakeList" },
   { label: "Odometer Details", path: "/OdometerDetails" },
+  { label: "Live Commands", path: "/LiveDataCommands" },
   { label: "Update commands", path: "/Updatecommand" },
   { label: "Fault Codes Uploader", path: "/FaultCodesUploader" },
   { label: "Activation Codes Uploader", path: "/ActivationCodesUploader" },
