@@ -61,12 +61,16 @@ const ActuationFetcher = () => {
     // Always add pagination parameters
     params.set('page', currentPage.toString());
     params.set('limit', ITEMS_PER_PAGE.toString());
-
+    const token = localStorage.getItem('token')
     const url = `${API_BASE_URL}api/ActuationCommands?${params.toString()}`;
 
     try {
       const res = await fetch(url, {
-        signal: abortControllerRef.current.signal
+        signal: abortControllerRef.current.signal,
+        headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}), // ✅ attach token
+        },
       });
       
       if (!res.ok) {

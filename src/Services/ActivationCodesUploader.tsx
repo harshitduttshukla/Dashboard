@@ -109,7 +109,7 @@ const ActivationCodesUploader = () => {
         `${BASE_URL}api/uplodeactivationcode`
        
       ];
-
+      const token = localStorage.getItem("token");
       let response: Response | undefined;
 
       for (const endpoint of possibleEndpoints) {
@@ -118,6 +118,10 @@ const ActivationCodesUploader = () => {
           response = await fetch(endpoint, {
             method: 'POST',
             body: formData,
+            headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}), // ✅ attach token
+            },
           });
           
           if (response.status !== 404) {

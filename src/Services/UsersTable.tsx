@@ -37,7 +37,13 @@ const UsersTable: React.FC = () => {
       params.append('page', page.toString());
       params.append('limit', ITEMS_PER_PAGE.toString());
 
-      const response = await fetch(`${API_BASE_URL}api/users?${params.toString()}`);
+       const token = localStorage.getItem("token");
+      const response = await fetch(`${API_BASE_URL}api/users?${params.toString()}`,{
+         headers: {
+        "Content-Type": "application/json",
+        ...(token ? { authorization: `Bearer ${token}` } : {}), // ✅ attach token
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

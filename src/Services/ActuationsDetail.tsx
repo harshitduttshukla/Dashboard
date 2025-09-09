@@ -64,9 +64,14 @@ const ActuationsDetail = () => {
         limit: ITEMS_PER_PAGE.toString(),
         ...filters,
       });
-
+        const token =  localStorage.getItem("token");
       const response = await fetch(
-        `${API_BASE_URL}api/ActuationsDetail?${params.toString()}`
+        `${API_BASE_URL}api/ActuationsDetail?${params.toString()}`,{
+           headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}), // ✅ attach token
+        },
+        }
       );
 
       if (!response.ok) throw new Error("Failed to fetch actuations data");

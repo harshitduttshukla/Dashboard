@@ -14,8 +14,13 @@ const BikeMakeList: React.FC = () => {
 
     try {
       const url = `${BASE_URL}api/FetchMakeList?segement=${segment}`;
-
-      const response = await fetch(url);
+      const token = localStorage.getItem("token");
+      const response = await fetch(url,{
+        headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}), // ✅ attach token
+        },
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

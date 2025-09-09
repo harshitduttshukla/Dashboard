@@ -56,9 +56,13 @@ const OdometerDetails: React.FC = () => {
       )}&model=${encodeURIComponent(searchModel)}&year=${encodeURIComponent(
         searchYear
       )}&page=${currentPage}&limit=${ITEMS_PER_PAGE}`;
-
+      const token = localStorage.getItem("token");
       const response = await fetch(url, {
-        signal: abortControllerRef.current.signal
+        signal: abortControllerRef.current.signal,
+        headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}), // ✅ attach token
+        },
       });
       
       if (!response.ok) {

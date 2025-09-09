@@ -57,9 +57,13 @@ const LiveDateCommands : React.FC = () => {
         try {
             const url = `${API_BASE_URL}api/LiveDataCommands?make=${searchMake}&model=${searchModel}&module=${searchModule}&limit=${ITEMS_PER_PAGE}&page=${currentPage}`;
 
-
+          const token = localStorage.getItem("token");
             const response = await fetch(url,{
-                signal : abortControllerRef.current.signal
+                signal : abortControllerRef.current.signal,
+                headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}), // ✅ attach token
+                },
             })
 
             if(!response.ok){

@@ -105,13 +105,17 @@ const FaultCodesUploader = () => {
       ];
 
       let response: Response | undefined;
-
+      const token = localStorage.getItem("token");
       for (const endpoint of possibleEndpoints) {
         try {
           console.log(`Trying endpoint: ${endpoint}`);
           response = await fetch(endpoint, {
             method: 'POST',
             body: formData,
+            headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}), // ✅ attach token
+            },
           });
           
           if (response.status !== 404) {

@@ -41,9 +41,14 @@ const SPFCommands: React.FC = () => {
 
       params.append("page", page.toString());
       params.append("limit", ITEMS_PER_PAGE.toString());
-
+      const token =  localStorage.getItem("token");
       const url = `${BASE_URL}api/SPFCommands?${params.toString()}`;
-      const response = await fetch(url);
+      const response = await fetch(url,{
+        headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}), // ✅ attach token
+        },
+      });
       const json = await response.json();
 
       if (json.data && json.data.length > 0) {

@@ -180,11 +180,15 @@ const Updatecommand: React.FC = () => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('sheetName', sheetName.trim());
-
+    const token = localStorage.getItem("token");
     try {
       const response = await fetch(`${API_BASE_URL}api/UpdatesCommands`, {
         method: 'POST',
         body: formData,
+        headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}), // ✅ attach token
+        },
       });
 
       const data: UploadResponse = await response.json();
