@@ -19,7 +19,7 @@ import ActuationsDetail from "./Services/ActuationsDetail.tsx";
 import FaultCodesUploader from "./Services/FaultCodesUploader.tsx";
 import ActivationCodesUploader from "./Services/ActivationCodesUploader.tsx";
 import LiveDataCommands from "./Services/LiveDataCommands.tsx";
-import Signup from "./pages/Signup.tsx";
+// import Signup from "./pages/Signup.tsx";
 import Login from "./pages/Login.tsx";
 import RequireAuth from "./RequireAuth.tsx";
 
@@ -30,9 +30,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/" element={<Signup />} />
+        {/* <Route path="/signup" element={<Signup />} /> */}
+        {/* <Route path="/" element={<Signup />} /> */}
         <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
         {/* <Route path="/" element={<Layout />}>
          */}
         <Route path="" element={<RequireAuth><Layout /></RequireAuth>}>
