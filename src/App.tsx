@@ -19,6 +19,7 @@ import ActuationsDetail from "./Services/ActuationsDetail.tsx";
 import FaultCodesUploader from "./Services/FaultCodesUploader.tsx";
 import ActivationCodesUploader from "./Services/ActivationCodesUploader.tsx";
 import LiveDataCommands from "./Services/LiveDataCommands.tsx";
+import FaultCodesUploader2 from "./Services/FaultCodesUploader2.tsx";
 // import Signup from "./pages/Signup.tsx";
 import Login from "./pages/Login.tsx";
 import RequireAuth from "./RequireAuth.tsx";
@@ -55,6 +56,7 @@ function App() {
           <Route path="OdometerDetails" element={<OdometerDetails />} />
           <Route path="Updatecommand" element={<FileUploader />} />
           <Route path="FaultCodesUploader" element={<FaultCodesUploader />} />
+          <Route path="FaultCodesUploader2" element={<FaultCodesUploader2 />} />
           <Route path="ActivationCodesUploader" element={<ActivationCodesUploader />} />
         </Route>
       </Routes>

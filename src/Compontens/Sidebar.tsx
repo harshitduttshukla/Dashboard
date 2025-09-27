@@ -21,6 +21,7 @@ const menuItems: MenuItem[] = [
   { label: "Live Commands", path: "/LiveDataCommands" },
   { label: "Update commands", path: "/Updatecommand" },
   { label: "Fault Codes Uploader", path: "/FaultCodesUploader" },
+  { label: "Fault Codes Uploader 2", path: "/FaultCodesUploader2" },
   { label: "Activation Codes Uploader", path: "/ActivationCodesUploader" },
 ];
 

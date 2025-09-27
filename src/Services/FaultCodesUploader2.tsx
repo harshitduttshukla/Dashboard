@@ -1,49 +1,45 @@
 
-
-
 import React, { useState, useRef } from 'react';
-import { Upload, FileSpreadsheet, CheckCircle, AlertCircle, Key } from 'lucide-react';
+import { Upload, FileSpreadsheet, CheckCircle, AlertCircle, Bug, TrendingUp } from 'lucide-react';
 
 interface UploadResponse {
   message: string;
+  stats?: {
+    totalRowsProcessed: number;
+    insertedCount: number;
+    skippedCount: number;
+    deletedCount: number;
+    processingTimeMs: number;
+    rowsPerSecond: number;
+    fileName: string;
+    fileSize: number;
+    companyId: number;
+    worksheetName: string;
+  };
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
+const API_BASE_URL =  import.meta.env.VITE_API_BASE_URL || '';
 
-// Vehicle makes data array
-const VEHICLE_MAKES = [
-  'Ashok Leyland', 'Baic', 'Bajaj 3 Wheelers', 'Bajaj-Bikes', 'BMW', 'BMW Bikes', 'BYD',
-  'Chery', 'Chevrolet', 'Citroen', 'Daewoo', 'Ducati Bikes', 'Fiat', 'Force Motors', 'Ford',
-  'Geely', 'Geo', 'GMC', 'Great Wall', 'Haval', 'Honda', 'Honda Bikes', 'Husqvarna Bikes',
-  'Hyundai', 'Infiniti', 'Isuzu', 'JAC Motors', 'Jeep', 'KTM- Bikes', 'Land Rover', 'Lexus',
-  'MG', 'Mahindra', 'Mahindra 3 Wheelers', 'Maserati', 'Mercedes Benz', 'Mitsubishi', 'Nissan',
-  'Opel', 'Other Bikes', 'Perodua', 'Peugeot', 'Piaggio 3 Wheelers', 'Piaggio Bikes', 'Proton',
-  'Renault', 'Rover', 'Royal Enfield Bikes', 'Ssangyong', 'Subaru', 'Suzuki', 'Suzuki Bikes',
-  'TVS 3 Wheelers', 'TVS Bikes', 'Tata', 'Tata EV', 'Toyota', 'Triumph Bikes', 'UAZ', 'VAZ',
-  'Volkswagen', 'Volvo', 'Yamaha Bikes'
-];
-
-
-const Updatecommand: React.FC = () => {
+const FaultCodesUploader2: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [sheetName, setSheetName] = useState<string>('');
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState<string>('');
+  const [stats, setStats] = useState<UploadResponse['stats'] | null>(null);
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (selectedFile: File) => {
     if (selectedFile && (
       selectedFile.name.endsWith('.xlsx') || 
-      selectedFile.name.endsWith('.xls') || 
-      selectedFile.name.endsWith('.csv')
+      selectedFile.name.endsWith('.xls')
     )) {
       setFile(selectedFile);
       setUploadStatus('idle');
       setMessage('');
+      setStats(null);
     } else {
-      setMessage('Please select a valid Excel (.xlsx, .xls) or CSV file');
+      setMessage('Please select a valid Excel file (.xlsx or .xls)');
       setUploadStatus('error');
     }
   };
@@ -85,26 +81,20 @@ const Updatecommand: React.FC = () => {
       return;
     }
 
-    if (!sheetName.trim()) {
-      setMessage('Sheet name is required');
-      setUploadStatus('error');
-      return;
-    }
-
     setIsUploading(true);
     setUploadStatus('idle');
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('sheetName', sheetName.trim());
+    
     const token = localStorage.getItem("token");
+    
     try {
-      const response = await fetch(`${API_BASE_URL}api/UpdatesCommands`, {
+      const response = await fetch(`${API_BASE_URL}api/faultCodes`, {
         method: 'POST',
         body: formData,
         headers: {
-        // "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}), // ✅ attach token
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       });
 
@@ -112,9 +102,9 @@ const Updatecommand: React.FC = () => {
 
       if (response.ok) {
         setUploadStatus('success');
-        setMessage(data.message || 'File uploaded successfully!');
+        setMessage(data.message || 'Excel file uploaded successfully!');
+        setStats(data.stats || null);
         setFile(null);
-        setSheetName('');
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
@@ -139,23 +129,28 @@ const Updatecommand: React.FC = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  const formatTime = (ms: number): string => {
+    if (ms < 1000) return `${ms}ms`;
+    return `${(ms / 1000).toFixed(2)}s`;
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg p-6 mb-6 text-white">
+      <div className="bg-gradient-to-r from-red-600 to-orange-600 rounded-lg p-6 mb-6 text-white">
         <div className="flex items-center gap-3 mb-2">
-          <Key className="w-8 h-8" />
-          <h1 className="text-2xl font-bold">Activation Codes Uploader</h1>
+          <Bug className="w-8 h-8" />
+          <h1 className="text-2xl font-bold">Fault Codes Excel Importer</h1>
         </div>
-        <p className="text-purple-100">Import CSV or Excel files with activation codes, plans, duration, and vehicle information</p>
+        <p className="text-red-100">Import Excel files containing DTC codes, titles, severity levels, and repair difficulty data</p>
       </div>
 
       {/* File Upload Area */}
       <div
         className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ${
           isDragOver 
-            ? 'border-purple-400 bg-purple-50' 
-            : 'border-gray-300 hover:border-purple-400 hover:bg-gray-50'
+            ? 'border-red-400 bg-red-50' 
+            : 'border-gray-300 hover:border-red-400 hover:bg-gray-50'
         }`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -165,15 +160,15 @@ const Updatecommand: React.FC = () => {
           <Upload className="w-16 h-16 text-gray-400" />
           <div>
             <h3 className="text-lg font-medium text-gray-700 mb-2">
-              Drop your file here or click to browse
+              Drop your Excel file here or click to browse
             </h3>
             <p className="text-sm text-gray-500">
-              Supports .xlsx, .xls, and .csv files up to 10MB
+              Supports .xlsx and .xls files up to 50MB
             </p>
           </div>
           <button
             onClick={handleBrowseClick}
-            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           >
             Browse Files
           </button>
@@ -184,7 +179,7 @@ const Updatecommand: React.FC = () => {
       <input
         ref={fileInputRef}
         type="file"
-        accept=".xlsx,.xls,.csv"
+        accept=".xlsx,.xls"
         onChange={handleFileInputChange}
         className="hidden"
       />
@@ -202,52 +197,75 @@ const Updatecommand: React.FC = () => {
         </div>
       )}
 
-      {/* Sheet Name Select */}
-      <div className="mt-6">
-        <label htmlFor="sheetName" className="block text-sm font-medium text-gray-700 mb-2">
-          Sheet Name (Make) *
-        </label>
-        <select
-          id="sheetName"
-          value={sheetName}
-          onChange={(e) => setSheetName(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
-          disabled={isUploading}
-        >
-          <option value="">Select a make/sheet name</option>
-          {VEHICLE_MAKES.map((make) => (
-            <option key={make} value={make}>
-              {make}
-            </option>
-          ))}
-        </select>
-      </div>
-
       {/* Expected File Format */}
       <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <h4 className="font-medium text-gray-900 mb-3">Expected File Format:</h4>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
+        <h4 className="font-medium text-gray-900 mb-3">Expected Excel Format:</h4>
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-3">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-            <span className="text-sm font-medium">ActivationCode</span>
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <span className="text-sm font-medium">DTC</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm font-medium">Plan</span>
+            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+            <span className="text-sm font-medium">Title</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-            <span className="text-sm font-medium">Duration</span>
+            <span className="text-sm font-medium">Severity</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span className="text-sm font-medium">Repair Difficulty</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-            <span className="text-sm font-medium">Vehicle</span>
+            <span className="text-sm font-medium">Make</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-indigo-500 rounded-full"></div>
+            <span className="text-sm font-medium">Generic</span>
           </div>
         </div>
-        <p className="text-sm text-blue-700">
-          For CSV: Use headers like "ActivationCode", "Activation Code", or "activation_code" (similar flexibility for other fields)
-        </p>
+        <div className="space-y-2 text-sm text-blue-700">
+          <p>• Column A: DTC code (required)</p>
+          <p>• Column B: Error title/description</p>
+          <p>• Column C: Severity level (1-5)</p>
+          <p>• Column D: Repair difficulty (1-5)</p>
+          <p>• Column E: Vehicle make</p>
+          <p>• Column F: Company ID (extracted from Excel data)</p>
+          <p>• Column G: Generic flag (true/false)</p>
+        </div>
       </div>
+
+      {/* Upload Statistics */}
+      {stats && uploadStatus === 'success' && (
+        <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
+          <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-green-600" />
+            Import Statistics
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white p-3 rounded border">
+              <div className="text-2xl font-bold text-green-600">{stats.insertedCount}</div>
+              <div className="text-sm text-gray-600">New Records Added</div>
+            </div>
+            <div className="bg-white p-3 rounded border">
+              <div className="text-2xl font-bold text-yellow-600">{stats.skippedCount}</div>
+              <div className="text-sm text-gray-600">Duplicates Skipped</div>
+            </div>
+            <div className="bg-white p-3 rounded border">
+              <div className="text-2xl font-bold text-blue-600">{stats.totalRowsProcessed}</div>
+              <div className="text-sm text-gray-600">Total Rows Processed</div>
+            </div>
+          </div>
+          <div className="mt-3 text-sm text-gray-600 space-y-1">
+            <p><strong>Processing Time:</strong> {formatTime(stats.processingTimeMs)}</p>
+            <p><strong>Speed:</strong> {stats.rowsPerSecond} rows/second</p>
+            <p><strong>Worksheet:</strong> {stats.worksheetName}</p>
+            <p><strong>Company ID:</strong> {stats.companyId}</p>
+          </div>
+        </div>
+      )}
 
       {/* Status Message */}
       {message && (
@@ -269,19 +287,19 @@ const Updatecommand: React.FC = () => {
       <div className="mt-6 flex justify-center">
         <button
           onClick={handleUpload}
-          disabled={!file || !sheetName.trim() || isUploading}
+          disabled={!file || isUploading}
           className={`px-8 py-3 rounded-lg font-medium flex items-center gap-2 transition-all duration-200 ${
-            !file || !sheetName.trim() || isUploading
+            !file || isUploading
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-purple-600 text-white hover:bg-purple-700 hover:shadow-lg transform hover:scale-105'
+              : 'bg-red-600 text-white hover:bg-red-700 hover:shadow-lg transform hover:scale-105'
           }`}
         >
           <Upload className="w-5 h-5" />
-          {isUploading ? 'Uploading...' : 'Upload & Import'}
+          {isUploading ? 'Processing Excel...' : 'Import Fault Codes'}
         </button>
       </div>
     </div>
   );
 };
 
-export default Updatecommand;
+export default FaultCodesUploader2;
