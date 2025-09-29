@@ -25,7 +25,7 @@ const FaultCodeSymptoms = () => {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
 
-    const abortControllerRef = useRef(null);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
     const fetchFaultData = async (
         targetPage = 1,

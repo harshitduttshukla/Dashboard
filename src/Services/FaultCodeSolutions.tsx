@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import  { useEffect, useState, useRef } from "react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const ITEMS_PER_PAGE = 30;
@@ -25,7 +25,7 @@ const FaultCodeSolutions = () => {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
 
-    const abortControllerRef = useRef(null);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
     const fetchSolutionData = async (
         targetPage = 1,
@@ -101,7 +101,7 @@ const FaultCodeSolutions = () => {
                 setError("Invalid response format from server");
             }
 
-        } catch (err) {
+        } catch (err:any) {
             if (err.name === 'AbortError') {
                 console.log('🚫 Request aborted');
                 return;
@@ -122,12 +122,12 @@ const FaultCodeSolutions = () => {
         fetchSolutionData(1, "", "", "");
     }, []);
 
-    const handleSearch = (e) => {
+    const handleSearch = (e:any) => {
         e.preventDefault();
         fetchSolutionData(1, dtc, make, generic);
     };
 
-    const handlePageChange = (newPage) => {
+    const handlePageChange = (newPage:any) => {
         console.log('🔄 Page change requested:', { 
             newPage, 
             currentPage: page, 
@@ -247,7 +247,7 @@ const FaultCodeSolutions = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {solutionData.map((item, idx) => (
+                                    {solutionData.map((item:any, idx) => (
                                         <tr key={item.id || idx} className="hover:bg-gray-50">
                                             <td className="border px-3 py-2">
                                                 {item.id || "-"}
