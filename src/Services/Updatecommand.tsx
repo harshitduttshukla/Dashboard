@@ -145,7 +145,7 @@ const Updatecommand: React.FC = () => {
       <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg p-6 mb-6 text-white">
         <div className="flex items-center gap-3 mb-2">
           <Key className="w-8 h-8" />
-          <h1 className="text-2xl font-bold">Activation Codes Uploader</h1>
+          <h1 className="text-2xl font-bold">Update Commands</h1>
         </div>
         <p className="text-purple-100">Import CSV or Excel files with activation codes, plans, duration, and vehicle information</p>
       </div>
