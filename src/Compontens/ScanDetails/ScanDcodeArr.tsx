@@ -137,10 +137,10 @@ const ScanDcodeArr: React.FC<ScanProps> = ({
               <tr>
                 <HeaderAndValue header={true} Title="System" />
                 <HeaderAndValue header={true} Title="PID" />
-                <HeaderAndValue header={true} Title="Make" />
+                <HeaderAndValue header={true} Title="Data" />
                 <HeaderAndValue header={true} Title="Header" />
                 <HeaderAndValue header={true} Title="Protocol" />
-                <HeaderAndValue header={true} Title="Data" />
+                <HeaderAndValue header={true} Title="Make" />
               </tr>
             </thead>
             <tbody>
@@ -148,13 +148,13 @@ const ScanDcodeArr: React.FC<ScanProps> = ({
                 <tr key={index} className="hover:bg-gray-50">
                   <HeaderAndValue Title={item.system} />
                   <HeaderAndValue Title={item.pid} />
-                  <HeaderAndValue Title={item.make} />
+                  <HeaderAndValue Title={item.data} />
                   <HeaderAndValue Title={item.header} />
                   <HeaderAndValue Title={item.protocol} />
-                  <HeaderAndValue Title={item.data} />
+                  <HeaderAndValue Title={item.make} />
                 </tr>
               ))}
-            </tbody>
+            </tbody>+
           </table>
         ) : (
           <p className="text-gray-500 italic">No scan data available.</p>
